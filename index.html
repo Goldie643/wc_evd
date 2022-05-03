@@ -6,7 +6,15 @@
   </head>
 
   <body class="darktheme" style="overflow:hidden">
-    <script src="three.js"></script>
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "./three.module.js"
+      }
+    }
+		</script>
+    <!-- <script src="three.js"></script> -->
+    <!-- <script src="OrbitControls.js"></script> -->
     <script type="module" src="event_display.js"></script>
   </body>
 </html>
