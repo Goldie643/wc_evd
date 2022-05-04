@@ -1,8 +1,6 @@
 import * as THREE from "three"
-
+import { pmt_info } from "./pmt_prod_year.js"
 import { OrbitControls } from "./OrbitControls.js"
-
-const fs = require('fs');
 
 
 // Event Display Code
@@ -69,10 +67,11 @@ function PlotHits( scene, hits ) {
 function PlotPMTs( scene, pmt_info ) {
     const pmt_geom = new THREE.SphereGeometry( 25, 32, 16 );
     const material = new THREE.MeshBasicMaterial( {color: 0x808080,
-        transparent: true, opacity: 0.5} );
+        transparent: true, opacity: 0.1} );
     for (let pmt of pmt_info) {
         const mesh = new THREE.Mesh( pmt_geom, material );
-        mesh.position.set( pmt.x, pmt.y, pmt.z );
+        // SK orientates Z upwards (which is correct, by the way)
+        mesh.position.set( pmt.x, pmt.z, pmt.y );
         scene.add( mesh );
     }
 }
@@ -84,10 +83,10 @@ document.body.appendChild(renderer.domElement);
 
 // Setup a scene
 const scene = new THREE.Scene();
-const detectorMesh = PlotDetector();
-scene.add(detectorMesh);
+// const detectorMesh = PlotDetector();
+// scene.add(detectorMesh);
 
-pmt_info = ParsePMTInfo()
+// pmt_info = ParsePMTInfo()
 
 PlotHits( scene, hits );
 PlotPMTs( scene, pmt_info );
