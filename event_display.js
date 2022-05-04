@@ -3,7 +3,16 @@ import { pmt_info } from "./pmt_prod_year.js"
 import { OrbitControls } from "./OrbitControls.js"
 
 const hits = [];
-hits.push( new THREE.Vector3( 1690, 1810, 0 ) );
+// hits.push( new THREE.Vector3( 1690, 1810, 0 ) );
+function getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+for (let i = 0; i <200; i++) {
+    hits.push(getRandomInt(1, 11146))
+}
 
 // Use and convert detector geo into an actual mesh.
 function PlotDetector( scene ) {
@@ -30,12 +39,17 @@ function PlotHits( scene, hits ) {
 }
 
 // Plot all PMTs from pmt_info
-function PlotPMTs( scene, pmt_info ) {
+function PlotPMTs( scene, pmt_info, hits=[] ) {
     const pmt_geom = new THREE.SphereGeometry( 25, 32, 16 );
-    const material = new THREE.MeshBasicMaterial( {color: 0x808080,
+    const nohit_mat = new THREE.MeshBasicMaterial( {color: 0x808080,
         transparent: true, opacity: 0.1} );
+    const hit_mat = new THREE.MeshBasicMaterial( {color: 0xFFFF00} )
     for (let pmt of pmt_info) {
-        const mesh = new THREE.Mesh( pmt_geom, material );
+        let mat = nohit_mat;
+        if (hits.includes( pmt.cable )) {
+            mat = hit_mat;
+        };
+        const mesh = new THREE.Mesh( pmt_geom, mat );
         // SK orientates Z upwards (which is correct, by the way)
         mesh.position.set( pmt.x, pmt.z, pmt.y );
         scene.add( mesh );
@@ -54,8 +68,8 @@ const scene = new THREE.Scene();
 
 // Add all the meshes to the scene
 // PlotDetector( scene );
-PlotHits( scene, hits );
-PlotPMTs( scene, pmt_info );
+// PlotHits( scene, hits );
+PlotPMTs( scene, pmt_info, hits );
 
 // Setup a default camera (other control types like Ortho are available).
 const camera = new THREE.PerspectiveCamera( 45, window.innerWidth /
