@@ -11,7 +11,7 @@ import { OrbitControls } from "./OrbitControls.js"
 // detector.push( new THREE.Vector3( 10, 0, 0 ) );
 
 const hits = [];
-hits.push( new THREE.Vector3( 0, 0, 0 ) );
+hits.push( new THREE.Vector3( 1690, 1810, 0 ) );
 
 // Use and convert detector geo into an actual mesh.
 function PlotDetector() {
@@ -32,7 +32,8 @@ function PlotHits( scene, hits ) {
     const hit_geom = new THREE.SphereGeometry( 25, 32, 16 );
     for (let hit of hits) {
         const mesh = new THREE.Mesh( hit_geom, material )
-        // mesh.position.set( hit );
+        mesh.position.copy( hit );
+        // mesh.position.set( 100, 100, 100 );
         scene.add( mesh );
     }
 
