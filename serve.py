@@ -1,6 +1,5 @@
 import sys
 import uproot
-import pandas as pd
 import numpy as np
 import http.server
 import socketserver
@@ -9,6 +8,18 @@ class WCEVDRequestHandler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, df):
         self.df = df
         self.event_i = 0
+        self.loading_page = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset=\"utf-8\">
+            <script>setTimeout(function(){{ window.location.replace('/'); }}, 0);</script>
+        </head>
+        <body>
+            <h1>Loading...</h1>
+        </body>
+        </html>
+        """
         return
     
     def __call__(self, *args, **kwargs):
@@ -25,6 +36,28 @@ class WCEVDRequestHandler(http.server.SimpleHTTPRequestHandler):
         
         return
 
+    def next(self):
+        self.event_i += 1
+
+        self.send_response(200)
+        self.send_header("Content-type", "text/html")
+        self.end_headers()
+
+        self.wfile.write(bytes(self.loading_page, "utf8"))
+
+        return
+
+    def previous(self):
+        self.event_i -= 1
+
+        self.send_response(200)
+        self.send_header("Content-type", "text/html")
+        self.end_headers()
+
+        self.wfile.write(bytes(self.loading_page, "utf8"))
+
+        return
+
     def do_GET(self):
         if self.path == '/favicon.ico':
             return
@@ -34,22 +67,10 @@ class WCEVDRequestHandler(http.server.SimpleHTTPRequestHandler):
         elif self.path == "/event.json":
             return self.make_event_json()
         elif self.path == '/next':
-            self.event_i += 1
-            html = f"""
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <meta charset=\"utf-8\">
-                <script>setTimeout(function(){{ window.location.replace('/'); }}, 0);</script>
-            </head>
-            <body>
-                <h1>Loading...</h1>
-            </body>
-            </html>
-            """
-
-            self.wfile.write(bytes(html, "utf8"))
-
+            self.next()
+            return
+        elif self.path == '/previous':
+            self.previous()
             return
         
         return http.server.SimpleHTTPRequestHandler.do_GET(self)
