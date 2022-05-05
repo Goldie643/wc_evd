@@ -2,7 +2,7 @@ import * as THREE from "three"
 import { pmt_info } from "./pmt_prod_year.js"
 import { OrbitControls } from "./OrbitControls.js"
 
-const hits = [];
+// const hits = [];
 // hits.push( new THREE.Vector3( 1690, 1810, 0 ) );
 function getRandomInt(min, max) {
     min = Math.ceil(min);
@@ -10,9 +10,13 @@ function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-for (let i = 0; i <200; i++) {
-    hits.push(getRandomInt(1, 11146))
-}
+// for (let i = 0; i <10; i++) {
+//     hits.push(getRandomInt(1, 11146))
+// }
+
+const event = await fetch("hits.json").then(response => response.json());
+const hits = event.cables
+// let truth_trajs = fetch("trajs.json").then(response => response.json());
 
 // Use and convert detector geo into an actual mesh.
 function PlotDetector( scene ) {
