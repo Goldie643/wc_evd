@@ -1,4 +1,5 @@
 import * as THREE from "three"
+import CSG from "./three-csg.js"
 import { pmt_info } from "./pmt_prod_year.js"
 import { OrbitControls } from "./OrbitControls.js"
 
@@ -94,12 +95,12 @@ function PlotVTX( scene, vtx ) {
     scene.add( arrowHelper );
 
     // Now 42deg Cherenkov cone
-    const cone_l = 1000;
-    const cone_r = cone_l*Math.tan( 42 );
-    const cone_geom = new THREE.ConeGeometry( cone_r, cone_l, 32, true );
+    const cone_l = MAX_R;
+    const cone_r = cone_l*Math.tan( 42/2 );
+    const cone_geom = new THREE.ConeGeometry( cone_r, cone_l, 32 );
 
     const cone_mat = new THREE.MeshBasicMaterial( {color: 0xd91ff, 
-        transparent: true, opacity: 0.2} );
+        transparent: true, opacity: 0.2, side: THREE.DoubleSide} );
     const cone = new THREE.Mesh( cone_geom, cone_mat );
 
     // Align with event dir
@@ -116,7 +117,22 @@ function PlotVTX( scene, vtx ) {
         vtx.y + (vtx.y_dir*cone_l/2),
         vtx.z + (vtx.z_dir*cone_l/2)
     );
-    scene.add( cone )
+
+    // Clip from cylinder
+    const cyl = new THREE.Mesh(new THREE.CylinderGeometry( 
+        SKR, SKR, 2*SKHH, 64));
+    cyl.rotateX( Math.PI / 2 )
+
+    cyl.updateMatrix()
+    cone.updateMatrix()
+
+    const bsp_cyl = CSG.fromMesh( cyl );
+    const bsp_cone = CSG.fromMesh( cone );
+
+    const bsp_result = bsp_cone.intersect(bsp_cyl)
+    const cone_clip = CSG.toMesh( bsp_result, cone.matrix, cone.material )
+
+    scene.add( cone_clip )
     
     return
 }
