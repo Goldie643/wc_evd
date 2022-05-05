@@ -69,12 +69,14 @@ df = f.pandas.df(cols, flatten=False)
 df = df.rename(columns={
     "BONSAI.bx" : "x",
     "BONSAI.by" : "y",
-    "BONSAI.bz" : "z"
+    "BONSAI.bz" : "z",
+    "BONSAI.btheta" : "theta",
+    "BONSAI.bphi" : "phi"
 })
 
-df["x_dir"] = np.cos(df["BONSAI.btheta"])
-df["y_dir"] = np.sin(df["BONSAI.btheta"])
-df["z_dir"] = np.sin(df["BONSAI.bphi"])
+df["x_dir"] = np.cos(df["theta"])
+df["y_dir"] = np.sin(df["theta"])
+df["z_dir"] = np.sin(df["phi"])
 
 # Create an object of the above class
 handler = WCEVDRequestHandler(df)
