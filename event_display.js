@@ -2,20 +2,7 @@ import * as THREE from "three"
 import { pmt_info } from "./pmt_prod_year.js"
 import { OrbitControls } from "./OrbitControls.js"
 
-// const hits = [];
-// hits.push( new THREE.Vector3( 1690, 1810, 0 ) );
-function getRandomInt(min, max) {
-    min = Math.ceil(min);
-    max = Math.floor(max);
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-// for (let i = 0; i <10; i++) {
-//     hits.push(getRandomInt(1, 11146))
-// }
-
-const hits = await fetch("hits.json").then(response => response.json());
-const vtx = await fetch("vtx.json").then(response => response.json());
+const event = await fetch("event.json").then(response => response.json());
 
 // Use and convert detector geo into an actual mesh.
 function PlotDetector( scene ) {
@@ -93,8 +80,8 @@ const scene = new THREE.Scene();
 // Add all the meshes to the scene
 // PlotDetector( scene );
 // PlotHits( scene, hits );
-PlotPMTs( scene, pmt_info, hits.cables );
-PlotVTX( scene, vtx )
+PlotPMTs( scene, pmt_info, event.cable );
+PlotVTX( scene, event )
 
 // Setup a default camera (other control types like Ortho are available).
 const camera = new THREE.PerspectiveCamera( 45, window.innerWidth /
