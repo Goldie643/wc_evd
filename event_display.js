@@ -14,9 +14,8 @@ function getRandomInt(min, max) {
 //     hits.push(getRandomInt(1, 11146))
 // }
 
-const event = await fetch("hits.json").then(response => response.json());
-const hits = event.cables
-// let truth_trajs = fetch("trajs.json").then(response => response.json());
+const hits = await fetch("hits.json").then(response => response.json());
+const vtx = await fetch("vtx.json").then(response => response.json());
 
 // Use and convert detector geo into an actual mesh.
 function PlotDetector( scene ) {
@@ -62,6 +61,27 @@ function PlotPMTs( scene, pmt_info, hits=[] ) {
     return
 }
 
+function PlotVTX( scene, vtx ) {
+    const geom = new THREE.SphereGeometry( 25, 32, 16 );
+    const mat = new THREE.MeshBasicMaterial( {color: 0xFF0000} );
+    const mesh = new THREE.Mesh( geom, mat );
+
+    // SK orientates Z upwards (which is correct, by the way)
+    mesh.position.set( vtx.x, vtx.z, vtx.y );
+    scene.add( mesh );
+
+    // Now add an arrow for direction
+    const dir = new THREE.Vector3( vtx.x_dir, vtx.y_dir, vtx.z_dir );
+    dir.normalize();
+    const origin = new THREE.Vector3( vtx.x, vtx.z, vtx.y );
+    const length = 1000;
+    const hex = 0xFF0000
+    const arrowHelper = new THREE.ArrowHelper( dir, origin, length, hex );
+    scene.add( arrowHelper )
+    
+    return
+}
+
 // Setup renderer
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -73,7 +93,8 @@ const scene = new THREE.Scene();
 // Add all the meshes to the scene
 // PlotDetector( scene );
 // PlotHits( scene, hits );
-PlotPMTs( scene, pmt_info, hits );
+PlotPMTs( scene, pmt_info, hits.cables );
+PlotVTX( scene, vtx )
 
 // Setup a default camera (other control types like Ortho are available).
 const camera = new THREE.PerspectiveCamera( 45, window.innerWidth /

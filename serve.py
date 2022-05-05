@@ -12,12 +12,27 @@ def make_hits_json(self):
     self.wfile.write(bytes(json, "utf8"))
     
     return
+
+def make_vtx_json(self):
+    json = '{"x" : 400, "y" : -1000, "z" : 1100,'
+    json += '"x_dir" : 0.1, "y_dir" : 0.3, "z_dir" : 0.4}'
+
+    self.send_response(200)
+    self.send_header("Content-type", "application/json")
+    self.end_headers()
+
+    self.wfile.write(bytes(json, "utf8"))
+    
+    return
+
 class MyHttpRequestHandler(http.server.SimpleHTTPRequestHandler):
     def do_GET(self):
         if self.path == '/':
             self.path = 'index.html'
         elif self.path == "/hits.json":
             return make_hits_json(self)
+        elif self.path == "/vtx.json":
+            return make_vtx_json(self)
         
         return http.server.SimpleHTTPRequestHandler.do_GET(self)
 
