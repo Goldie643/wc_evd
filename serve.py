@@ -47,7 +47,7 @@ class WCEVDRequestHandler(http.server.SimpleHTTPRequestHandler):
 
         return
 
-    def previous(self):
+    def prev(self):
         self.event_i -= 1
 
         self.send_response(200)
@@ -69,8 +69,8 @@ class WCEVDRequestHandler(http.server.SimpleHTTPRequestHandler):
         elif self.path == '/next':
             self.next()
             return
-        elif self.path == '/previous':
-            self.previous()
+        elif self.path == '/prev':
+            self.prev()
             return
         
         return http.server.SimpleHTTPRequestHandler.do_GET(self)

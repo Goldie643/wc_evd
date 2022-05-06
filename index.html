@@ -14,5 +14,16 @@
     }
 		</script>
     <script type="module" src="event_display.js"></script>
+    <script>
+      function FetchAndReload(path) {
+          fetch(path).then(response => {
+              if (response.ok) {
+                  window.location.replace('/')
+              }
+          })
+      }
+    </script>
+    <button onclick="FetchAndReload('/next')">Next</button>
+    <button onclick="FetchAndReload('/prev')">Prev</button>
   </body>
 </html>
