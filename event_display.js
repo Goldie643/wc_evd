@@ -38,7 +38,6 @@ function PlotHits( scene, hits ) {
 }
 
 // Plots a little red (x) green (y) blue (z) axis indicator 
-// FOR THE THREE JS CONVENTION *NOT* SK
 function PlotXYZ( scene ) {
     // Now add an arrow for direction
     const x = new THREE.Vector3( 1, 0, 0 );
@@ -58,17 +57,67 @@ function PlotXYZ( scene ) {
     scene.add( z_arr );
 }
 
+const rainbowGrad = [
+    { pct: 0.0, color: { r: 0xff, g: 0x00, b: 0 } },
+    { pct: 0.5, color: { r: 0xff, g: 0xff, b: 0 } },
+    { pct: 1.0, color: { r: 0x00, g: 0xff, b: 0 } } ];
+const blueGrad = [
+    { pct: 0.0, color: { r: 0xff, g: 0xff, b: 0xff } },
+    { pct: 1.0, color: { r: 0x00, g: 0x60, b: 0xff } } ];
+const redGrad = [
+    { pct: 0.0, color: { r: 0xff, g: 0xff, b: 0xff } },
+    { pct: 1.0, color: { r: 0xff, g: 0x16, b: 0x00 } } ];
+
+function PickColour(pct, percentColors=rainbowGrad) {
+    for (var i = 1; i < percentColors.length - 1; i++) {
+        if (pct < percentColors[i].pct) {
+            break;
+        }
+    }
+    var lower = percentColors[i - 1];
+    var upper = percentColors[i];
+    var range = upper.pct - lower.pct;
+    var rangePct = (pct - lower.pct) / range;
+    var pctLower = 1 - rangePct;
+    var pctUpper = rangePct;
+    var color = {
+        r: Math.floor(lower.color.r * pctLower + upper.color.r * pctUpper),
+        g: Math.floor(lower.color.g * pctLower + upper.color.g * pctUpper),
+        b: Math.floor(lower.color.b * pctLower + upper.color.b * pctUpper)
+    };
+    return 'rgb(' + [color.r, color.g, color.b].join(',') + ')';
+    // or output as hex if preferred
+};
+
 // Plot all PMTs from pmt_info
-function PlotPMTs( scene, pmt_info, hits=[] ) {
+function PlotPMTs( scene, pmt_info, event ) {
     const pmt_geom = new THREE.SphereGeometry( 25, 32, 16 );
     const nohit_mat = new THREE.MeshBasicMaterial( {color: 0x808080,
         transparent: true, opacity: 0.1} );
-    const hit_mat = new THREE.MeshBasicMaterial( {color: 0xFFFF00} )
     for (let pmt of pmt_info) {
         let mat = nohit_mat;
-        if (hits.includes( pmt.cable )) {
-            mat = hit_mat;
+        if (event.cable.includes( pmt.cable )) {
+            // Don't plot hit PMTs
+            continue;
         };
+        const mesh = new THREE.Mesh( pmt_geom, mat );
+        mesh.position.set( pmt.x, pmt.y, pmt.z );
+        scene.add( mesh );
+    }
+
+    // const hit_mat = new THREE.MeshBasicMaterial( {color: 0xFFFF00} );
+    const t_max = Math.max(...event.t);
+    const t_min = Math.min(...event.t);
+    // Loop through all hits
+    for (let i = 0; i < event.cable.length; i++) {
+        let cable = event.cable[i];
+        let t = event.t[i];
+        let t_scaled = (t-t_min)/(t_max-t_min)
+        // PMT cables are 1-indexed
+        let pmt = pmt_info[cable-1];
+        let hit_mat = new THREE.MeshBasicMaterial( 
+            {color: PickColour(t_scaled)} );
+        let mat = hit_mat;
         const mesh = new THREE.Mesh( pmt_geom, mat );
         mesh.position.set( pmt.x, pmt.y, pmt.z );
         scene.add( mesh );
@@ -148,7 +197,7 @@ const scene = new THREE.Scene();
 // Add all the meshes to the scene
 // PlotDetector( scene );
 // PlotHits( scene, hits );
-PlotPMTs( scene, pmt_info, event.cable );
+PlotPMTs( scene, pmt_info, event );
 PlotVTX( scene, event )
 PlotXYZ( scene )
 
