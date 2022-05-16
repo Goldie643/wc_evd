@@ -16,30 +16,41 @@
       }
       .button:hover {
         background-color: rgb(41, 48, 58);
+        cursor: pointer;
       }
-      .wrapper{
-        display: grid;
-        grid-template-columns: 0.1fr 1fr 0.1fr;
-        grid-template-rows: 1fr 1fr 1fr;
-        gap: 10px;
+      .column {
+        float: left;
+        vertical-align: middle;
       }
-      .lbox {
-        grid-column: 1;
-        grid-row: 1 / 4;
-        justify-content: center;
-        align-content: center;
+      .column.side {
+        width: 10%;
       }
-      /* .centrebox {
-        grid-column: 2;
-        grid-row: 2 / 4;
+      .column.middle {
+        width: 80%;
+      }
+      /* Clear floats after the columns */
+      .row:after {
+        content: "";
+        display: table;
+        clear: both;
+      }
+      /* #evd_renderer {
+        position: static;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
       } */
-      .fullbox {
-        grid-column: 1 / 4;
-        grid-row: 1 / 4;
-      }
-      .rbox {
-        grid-column: 3;
-        grid-row: 1 / 4;
+      #evd_renderer {
+        /* background-color: #000; */
+        width: 1000px;
+        height: 1000px;
+        border: 1px solid black;
+        margin: 100px;
+        padding: 0px;
+        position: static; 
+        top: 100px;
+        left: 100px;
       }
       * {
         font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
@@ -50,36 +61,34 @@
   </head>
   <!-- <body class="darktheme" style="overflow:hidden"> -->
   <body class="darktheme" style="background-color: rgb(31, 34, 36);">
-
     <!-- <h1>WCEVD - Water Cherenkov Event Display</h2> -->
-
-    <div class="wrapper">
-      <div class="fullbox">
-        <script type="importmap">
-        {
-          "imports": {
-            "three": "./three.module.js"
-          }
-        }
-        </script>
-        <script type="module" src="event_display.js"></script>
-        <script>
-          function FetchAndReload(path) {
-              fetch(path).then(response => {
-                  if (response.ok) {
-                      window.location.replace('/')
-                  }
-              })
-          }
-        </script>
-      </div>
-      <div class="lbox">
-        <button class="button" onclick="FetchAndReload('/prev')"><</button>
-      </div>
-      <div class="rbox">
-        <button class="button" onclick="FetchAndReload('/next')">></button>
-      </div>
+    <!-- <div class="column side">
+      <button class="button" onclick="FetchAndReload('/prev')"><</button>
     </div>
-    <!-- <button onclick="FetchAndReload('/prev')">Prev</button> -->
+    <div class="column middle">
+      <div id="evd_renderer">
+    </div>
+    <div class="column side">
+      <button class="button" onclick="FetchAndReload('/next')">></button>
+    </div> -->
+
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "./three.module.js"
+      }
+    }
+    </script>
+    <script type="module" src="event_display.js"></script>
+    <script>
+      function FetchAndReload(path) {
+          fetch(path).then(response => {
+              if (response.ok) {
+                  window.location.replace('/')
+              }
+          })
+      }
+    </script>
+    <div id="evd_renderer">
   </body>
 </html>

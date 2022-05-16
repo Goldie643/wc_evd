@@ -186,10 +186,16 @@ function PlotVTX( scene, vtx ) {
     return
 }
 
+// Setup container to render into
+container = document.getElementById( "evd_renderer" )
+document.body.appendChild( container );
+
 // Setup renderer
-const renderer = new THREE.WebGLRenderer( {alpha: true} );
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
+// const renderer = new THREE.WebGLRenderer( {alpha: true} );
+const renderer = new THREE.WebGLRenderer();
+// renderer.setSize( window.innerWidth, window.innerHeight );
+renderer.setSize( 200, 200 );
+container.appendChild( renderer.domElement );
 
 // Setup a scene
 const scene = new THREE.Scene();
