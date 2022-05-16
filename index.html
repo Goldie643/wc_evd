@@ -14,64 +14,25 @@
         width: 100px;
         height: 50px;
       }
+      .button.prev {
+        position: absolute;
+        top: 50%;
+        left: 10px;
+      }
+      .button.next {
+        position: absolute;
+        top: 50%;
+        right: 10px;
+      }
       .button:hover {
         background-color: rgb(41, 48, 58);
         cursor: pointer;
       }
-      .grid {
-        display: grid;
-        gap: 10px;
-        grid-template-columns: repeat(4, 1fr);
-        grid-template-rows: repeat(3, 1fr);
-        width: 98vw;
-        height: 98vh;
-      }
-      .left_full {
-        grid-column: 1;
-        grid-row: 1 / 4;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
-      .centre_full {
-        grid-column: 2 / 5;
-        grid-row: 1 / 4;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
-      .right_full {
-        grid-column: 4;
-        grid-row: 1 / 4;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
-      .centre_head {
-        grid-column: 2 / 4;
-        grid-row: 1;
-        display: flex;
-        justify-content: center;
-        /* align-items: center; */
-      }
-      .footer{
-        grid-column: 1 / -1;
-        grid-row: -1;
-        display: flex;
-        justify-content: right;
-        align-items: bottom;
-      }
-      .footer.ral{
+      .rfooter{
+        position: absolute;
+        bottom: 8px;
+        right: 16px;
         text-align: right;
-      }
-      .footer.lal{
-        text-align: left;
-      }
-      /* Clear floats after the columns */
-      .row:after {
-        content: "";
-        display: table;
-        clear: both;
       }
       #evd_renderer {
         position: absolute; 
@@ -81,7 +42,7 @@
         right: 0;
         width: 100%;
         height: 100%;
-        /* z-index: -1; */
+        z-index: -1;
       }
       * {
         font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
@@ -93,19 +54,11 @@
   <!-- <body class="darktheme" style="overflow:hidden"> -->
   <body class="darktheme" style="background-color: rgb(31, 34, 36);">
 
-    <div class="grid">
-      <div class="left_full">
-        <button class="button" onclick="FetchAndReload('/prev')"><</button>
-      </div>
-      <div class="centre_full">
-      </div>
-      <div class="right_full">
-        <button class="button" onclick="FetchAndReload('/next')">></button>
-      </div>
-      <div class="footer ral">
+      <button class="button prev" onclick="FetchAndReload('/prev')"><</button>
+      <button class="button next" onclick="FetchAndReload('/next')">></button>
+      <div class="rfooter">
         WCEVD by Alex Goldsack
       </div>
-    </div>
 
     <div id="evd_renderer">
     </div>
