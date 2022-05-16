@@ -224,3 +224,11 @@ function animate() {
 	renderer.render( scene, camera );
 };
 animate();
+
+
+// Now print out event information
+const run_info_str = `Run: ${event.nrunsk}\n Subrun: ${event.nsubsk}\n Event: ${event.nevsk}`;
+const run_info = document.getElementById("run_info");
+const run_text = document.createTextNode(run_info_str);
+
+run_info.appendChild(run_text);

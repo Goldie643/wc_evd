@@ -44,6 +44,11 @@
         height: 100%;
         z-index: -1;
       }
+      #run_info {
+        position: absolute;
+        top: 30px;
+        white-space: pre-line;
+      }
       * {
         font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
           'Lucida Sans', Arial, sans-serif;
@@ -54,14 +59,16 @@
   <!-- <body class="darktheme" style="overflow:hidden"> -->
   <body class="darktheme" style="background-color: rgb(31, 34, 36);">
 
-      <button class="button prev" onclick="FetchAndReload('/prev')"><</button>
-      <button class="button next" onclick="FetchAndReload('/next')">></button>
-      <div class="rfooter">
-        WCEVD by Alex Goldsack
-      </div>
+    <button class="button prev" onclick="FetchAndReload('/prev')"><</button>
+    <button class="button next" onclick="FetchAndReload('/next')">></button>
+    <div class="rfooter">
+      WCEVD by Alex Goldsack
+    </div>
 
     <div id="evd_renderer">
     </div>
+    <p id="run_info">
+    </p>
 
     <script type="importmap">
     {
