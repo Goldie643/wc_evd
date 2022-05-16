@@ -6,12 +6,9 @@
     <style>
       .button {
         border-style: solid;
-        /* background-color: rgb(56, 113, 192); */
         background-color: transparent;
-        /* color: rgb(212, 224, 241); */
         color: rgb(56, 113, 192);
         border-color: rgb(56, 113, 192);
-        font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
         font-size: xx-large;
         border-radius: 10px;
         width: 100px;
@@ -20,29 +17,69 @@
       .button:hover {
         background-color: rgb(41, 48, 58);
       }
+      .wrapper{
+        display: grid;
+        grid-template-columns: 0.1fr 1fr 0.1fr;
+        grid-template-rows: 1fr 1fr 1fr;
+        gap: 10px;
+      }
+      .lbox {
+        grid-column: 1;
+        grid-row: 1 / 4;
+        justify-content: center;
+        align-content: center;
+      }
+      /* .centrebox {
+        grid-column: 2;
+        grid-row: 2 / 4;
+      } */
+      .fullbox {
+        grid-column: 1 / 4;
+        grid-row: 1 / 4;
+      }
+      .rbox {
+        grid-column: 3;
+        grid-row: 1 / 4;
+      }
+      * {
+        font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
+          'Lucida Sans', Arial, sans-serif;
+        color: aliceblue;
+      }
     </style>
   </head>
   <!-- <body class="darktheme" style="overflow:hidden"> -->
-  <body style="background-color: rgb(31, 34, 36);">
-    <script type="importmap">
-    {
-      "imports": {
-        "three": "./three.module.js"
-      }
-    }
-		</script>
-    <script type="module" src="event_display.js"></script>
-    <script>
-      function FetchAndReload(path) {
-          fetch(path).then(response => {
-              if (response.ok) {
-                  window.location.replace('/')
-              }
-          })
-      }
-    </script>
-    <button class="button" onclick="FetchAndReload('/next')">></button>
-    <button class="button" onclick="FetchAndReload('/prev')"><</button>
+  <body class="darktheme" style="background-color: rgb(31, 34, 36);">
+
+    <!-- <h1>WCEVD - Water Cherenkov Event Display</h2> -->
+
+    <div class="wrapper">
+      <div class="fullbox">
+        <script type="importmap">
+        {
+          "imports": {
+            "three": "./three.module.js"
+          }
+        }
+        </script>
+        <script type="module" src="event_display.js"></script>
+        <script>
+          function FetchAndReload(path) {
+              fetch(path).then(response => {
+                  if (response.ok) {
+                      window.location.replace('/')
+                  }
+              })
+          }
+        </script>
+      </div>
+      <div class="lbox">
+        <button class="button" onclick="FetchAndReload('/prev')"><</button>
+      </div>
+      <div class="rbox">
+        <button class="button" onclick="FetchAndReload('/next')">></button>
+      </div>
+    </div>
     <!-- <button onclick="FetchAndReload('/prev')">Prev</button> -->
   </body>
 </html>
