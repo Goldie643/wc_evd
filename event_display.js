@@ -44,7 +44,7 @@ function PlotXYZ( scene ) {
     const y = new THREE.Vector3( 0, 1, 0 );
     const z = new THREE.Vector3( 0, 0, 1 );
     const origin = new THREE.Vector3( SKR+200, SKR+200, -SKHH );
-    const l = 1000;
+    const l = 500;
     const x_hex = 0xFF0000;
     const y_hex = 0x00FF00;
     const z_hex = 0x0000FF;
@@ -188,7 +188,7 @@ function PlotVTX( scene, vtx ) {
 
 // Setup container to render into
 const container = document.getElementById( "evd_renderer" )
-document.body.appendChild( container );
+// document.body.appendChild( container );
 
 // Setup renderer
 const renderer = new THREE.WebGLRenderer( {alpha: true} );
@@ -212,7 +212,7 @@ const camera = new THREE.PerspectiveCamera( 45, window.innerWidth /
 // Control camera with orbit controls
 const controls = new OrbitControls( camera, renderer.domElement );
 
-camera.position.set( 0, 10000, 5000 );
+camera.position.set( 0, 8000, 3000 );
 camera.lookAt( 0, 0, 0 );
 
 controls.update()
