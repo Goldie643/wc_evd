@@ -232,3 +232,21 @@ const run_info = document.getElementById("run_info");
 const run_text = document.createTextNode(run_info_str);
 
 run_info.appendChild(run_text);
+
+// Plot Q and T histograms
+// const thist = {
+//     x: event.t,
+//     type: "histogram",
+// };
+// const layout = {
+//     width: "200px",
+//     height: "150px",
+//     paper_bgcolor: "rgba(0,0,0,0)",
+//     plot_bgcolor: "rgba(0,0,0,0)",
+//     font: {
+//         family: "Trebuchet MS",
+//         color: "aliceblue"
+//     }
+// }
+// const data = [thist];
+// Plotly.newPlot("thist_div", data, layout)
