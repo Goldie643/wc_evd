@@ -68,7 +68,7 @@ const redGrad = [
     { pct: 0.0, color: { r: 0xff, g: 0xff, b: 0xff } },
     { pct: 1.0, color: { r: 0xff, g: 0x16, b: 0x00 } } ];
 
-function PickColour(pct, percentColors=rainbowGrad) {
+function PickColour(pct, percentColors=blueGrad) {
     for (var i = 1; i < percentColors.length - 1; i++) {
         if (pct < percentColors[i].pct) {
             break;
@@ -187,7 +187,7 @@ function PlotVTX( scene, vtx ) {
 }
 
 // Setup renderer
-const renderer = new THREE.WebGLRenderer();
+const renderer = new THREE.WebGLRenderer( {alpha: true} );
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 

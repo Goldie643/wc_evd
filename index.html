@@ -3,9 +3,27 @@
   <head>
     <meta charset="utf-8">
     <title>WCEVD</title>
+    <style>
+      .button {
+        border-style: solid;
+        /* background-color: rgb(56, 113, 192); */
+        background-color: transparent;
+        /* color: rgb(212, 224, 241); */
+        color: rgb(56, 113, 192);
+        border-color: rgb(56, 113, 192);
+        font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+        font-size: xx-large;
+        border-radius: 10px;
+        width: 100px;
+        height: 50px;
+      }
+      .button:hover {
+        background-color: rgb(41, 48, 58);
+      }
+    </style>
   </head>
-
-  <body class="darktheme" style="overflow:hidden">
+  <!-- <body class="darktheme" style="overflow:hidden"> -->
+  <body style="background-color: rgb(31, 34, 36);">
     <script type="importmap">
     {
       "imports": {
@@ -23,7 +41,8 @@
           })
       }
     </script>
-    <button onclick="FetchAndReload('/next')">Next</button>
-    <button onclick="FetchAndReload('/prev')">Prev</button>
+    <button class="button" onclick="FetchAndReload('/next')">></button>
+    <button class="button" onclick="FetchAndReload('/prev')"><</button>
+    <!-- <button onclick="FetchAndReload('/prev')">Prev</button> -->
   </body>
 </html>
