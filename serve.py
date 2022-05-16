@@ -80,7 +80,14 @@ cols = [
     "BONSAI*",
     "cable",
     "t",
-    "q"
+    "q",
+    "nrunsk",
+    "nsubsk",
+    "nevsk",
+    "swtrigger*",
+    "ndaysk*",
+    # "ntimsk*", # Not stored properly in WIT
+    "bsenergy"
 ]
 
 # Prep the file to plot events from
@@ -92,7 +99,11 @@ df = df.rename(columns={
     "BONSAI.by" : "y",
     "BONSAI.bz" : "z",
     "BONSAI.btheta" : "theta",
-    "BONSAI.bphi" : "phi"
+    "BONSAI.bphi" : "phi",
+    "swtrigger.trigid" : "trigid",
+    "ndaysk[3][0]" : "year",
+    "ndaysk[3][1]" : "month",
+    "ndaysk[3][2]" : "day"
 })
 
 df["x_dir"] = np.cos(df["theta"])
