@@ -34,23 +34,15 @@
         display: table;
         clear: both;
       }
-      /* #evd_renderer {
-        position: static;
+      #evd_renderer {
+        position: absolute; 
         top: 0;
         bottom: 0;
         left: 0;
         right: 0;
-      } */
-      #evd_renderer {
-        /* background-color: #000; */
-        width: 1000px;
-        height: 1000px;
-        border: 1px solid black;
-        margin: 100px;
-        padding: 0px;
-        position: static; 
-        top: 100px;
-        left: 100px;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
       }
       * {
         font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
@@ -61,16 +53,19 @@
   </head>
   <!-- <body class="darktheme" style="overflow:hidden"> -->
   <body class="darktheme" style="background-color: rgb(31, 34, 36);">
-    <!-- <h1>WCEVD - Water Cherenkov Event Display</h2> -->
-    <!-- <div class="column side">
+
+    <h1>WCEVD - Water Cherenkov Event Display</h2>
+    <div class="column side">
       <button class="button" onclick="FetchAndReload('/prev')"><</button>
     </div>
     <div class="column middle">
-      <div id="evd_renderer">
     </div>
     <div class="column side">
       <button class="button" onclick="FetchAndReload('/next')">></button>
-    </div> -->
+    </div>
+
+    <div id="evd_renderer">
+    </div>
 
     <script type="importmap">
     {
@@ -89,6 +84,5 @@
           })
       }
     </script>
-    <div id="evd_renderer">
   </body>
 </html>
