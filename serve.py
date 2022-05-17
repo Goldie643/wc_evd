@@ -1,8 +1,9 @@
 import sys
 import uproot
-import numpy as np
 import http.server
 import socketserver
+import numpy as np
+from urllib import parse
 
 class WCEVDRequestHandler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, df):
@@ -36,6 +37,7 @@ class WCEVDRequestHandler(http.server.SimpleHTTPRequestHandler):
         
         return
 
+    # Iterate up the event index to show
     def next(self):
         self.event_i += 1
 
@@ -47,8 +49,24 @@ class WCEVDRequestHandler(http.server.SimpleHTTPRequestHandler):
 
         return
 
+    # Iterate down the event index to show
     def prev(self):
         self.event_i -= 1
+
+        self.send_response(200)
+        self.send_header("Content-type", "text/html")
+        self.end_headers()
+
+        self.wfile.write(bytes(self.loading_page, "utf8"))
+
+        return
+
+    # Get the event with the passed nevsk
+    def event(self, nevsk):
+        # Get index matching the passed nevsk
+        event_i = np.where(self.df["nevsk"] == nevsk)[0][0]
+
+        self.event_i = event_i
 
         self.send_response(200)
         self.send_header("Content-type", "text/html")
@@ -61,7 +79,6 @@ class WCEVDRequestHandler(http.server.SimpleHTTPRequestHandler):
     def do_GET(self):
         if self.path == '/favicon.ico':
             return
-
         if self.path == '/':
             self.path = 'index.html'
         elif self.path == "/event.json":
@@ -71,6 +88,11 @@ class WCEVDRequestHandler(http.server.SimpleHTTPRequestHandler):
             return
         elif self.path == '/prev':
             self.prev()
+            return
+
+        qs = parse.parse_qs(parse.urlsplit(self.path).query)
+        if "event" in qs:
+            self.event(int(qs["event"][0]))
             return
         
         return http.server.SimpleHTTPRequestHandler.do_GET(self)
