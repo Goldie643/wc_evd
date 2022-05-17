@@ -43,7 +43,8 @@ function PlotXYZ( scene ) {
     const x = new THREE.Vector3( 1, 0, 0 );
     const y = new THREE.Vector3( 0, 1, 0 );
     const z = new THREE.Vector3( 0, 0, 1 );
-    const origin = new THREE.Vector3( SKR+200, SKR+200, -SKHH );
+    // const origin = new THREE.Vector3( SKR+200, SKR+200, -SKHH );
+    const origin = new THREE.Vector3( 0, 0, 0 );
     const l = 500;
     const x_hex = 0xFF0000;
     const y_hex = 0x00FF00;
@@ -190,6 +191,7 @@ function PlotVTX( scene, vtx ) {
 
 // Setup container to render into
 const container = document.getElementById( "evd_renderer" )
+const xyz_container = document.getElementById( "xyz_renderer" )
 // document.body.appendChild( container );
 
 // Setup renderer
@@ -197,25 +199,39 @@ const renderer = new THREE.WebGLRenderer( {alpha: true} );
 renderer.setSize( container.clientWidth, container.clientHeight );
 container.appendChild( renderer.domElement );
 
+const xyz_renderer = new THREE.WebGLRenderer( {alpha: true} );
+xyz_renderer.setSize( xyz_container.clientWidth, xyz_container.clientHeight );
+xyz_container.appendChild( xyz_renderer.domElement );
+
 // Setup a scene
 const scene = new THREE.Scene();
+const xyz_scene =  new THREE.Scene();
 
 // Add all the meshes to the scene
 // PlotDetector( scene );
 // PlotHits( scene, hits );
 PlotPMTs( scene, pmt_info, event );
 PlotVTX( scene, event )
-PlotXYZ( scene )
+PlotXYZ( xyz_scene )
 
 // Setup a default camera (other control types like Ortho are available).
 const camera = new THREE.PerspectiveCamera( 45, window.innerWidth /
     window.innerHeight, 1, 100000 );
+const xyz_camera = new THREE.PerspectiveCamera( 45, window.innerWidth /
+    window.innerHeight, 1, 100000 );
 
 // Control camera with orbit controls
 const controls = new OrbitControls( camera, renderer.domElement );
+// Separate control
+const xyz_controls = new OrbitControls( xyz_camera, renderer.domElement );
+xyz_controls.enableZoom = false
+xyz_controls.enablePan = false
 
 camera.position.set( 0, 8000, 3000 );
 camera.lookAt( 0, 0, 0 );
+xyz_camera.position.set( 0, 80000, 30000 );
+xyz_camera.lookAt( 0, 0, 0 );
+xyz_camera.setFocalLength(2000)
 
 // controls.saveState();
 controls.update()
@@ -223,8 +239,10 @@ controls.update()
 // renderer.render( scene, camera );
 function animate() {
     controls.update()
+    xyz_controls.update()
 	requestAnimationFrame( animate );
 	renderer.render( scene, camera );
+	xyz_renderer.render( xyz_scene, xyz_camera );
 };
 animate();
 
@@ -253,19 +271,42 @@ const run_text = document.createTextNode(run_info_str);
 run_info.appendChild(run_text);
 
 // Plot Q and T histograms
-// const thist = {
-//     x: event.t,
-//     type: "histogram",
-// };
-// const layout = {
-//     width: "200px",
-//     height: "150px",
-//     paper_bgcolor: "rgba(0,0,0,0)",
-//     plot_bgcolor: "rgba(0,0,0,0)",
-//     font: {
-//         family: "Trebuchet MS",
-//         color: "aliceblue"
-//     }
-// }
-// const data = [thist];
-// Plotly.newPlot("thist_div", data, layout)
+const thist = {
+    x: event.t,
+    type: "histogram",
+};
+const thist_layout = {
+    width: "500",
+    height: "400",
+    paper_bgcolor: "rgba(0,0,0,0)",
+    plot_bgcolor: "rgba(0,0,0,0)",
+    font: {
+        family: "Trebuchet MS",
+        color: "aliceblue"
+    },
+    xaxis: {
+        title: "t [ns]"
+    }
+}
+const tdata = [thist];
+Plotly.newPlot("thist_div", tdata, thist_layout);
+
+const qhist = {
+    x: event.q,
+    type: "histogram",
+};
+const qhist_layout = {
+    width: "500",
+    height: "400",
+    paper_bgcolor: "rgba(0,0,0,0)",
+    plot_bgcolor: "rgba(0,0,0,0)",
+    font: {
+        family: "Trebuchet MS",
+        color: "aliceblue"
+    },
+    xaxis: {
+        title: "q [pe]"
+    }
+}
+const qdata = [qhist];
+Plotly.newPlot("qhist_div", qdata, qhist_layout);
