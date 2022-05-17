@@ -96,7 +96,6 @@ cols = [
 f = sys.argv[1]
 f = uproot.open(f)["wit"]
 df = f.pandas.df(cols, flatten=False)
-df = df[df["bsenergy"] > 5]
 df = df.rename(columns={
     # "BONSAI.bx" : "x",
     # "BONSAI.by" : "y",
@@ -123,7 +122,7 @@ df = df.rename(columns={
 # Create an object of the above class
 handler = WCEVDRequestHandler(df)
 
-PORT = 8000
+PORT = 8001
 my_server = socketserver.TCPServer(("", PORT), handler)
 
 # Star the server
