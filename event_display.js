@@ -217,6 +217,7 @@ const controls = new OrbitControls( camera, renderer.domElement );
 camera.position.set( 0, 8000, 3000 );
 camera.lookAt( 0, 0, 0 );
 
+// controls.saveState();
 controls.update()
 
 // renderer.render( scene, camera );
@@ -227,6 +228,14 @@ function animate() {
 };
 animate();
 
+const reset_btn = document.getElementById("reset_button"); 
+reset_btn.addEventListener("click", resetView)
+
+function resetView() { 
+    camera.position.set( 0, 8000, 3000 );
+    camera.lookAt( 0, 0, 0 );
+    return
+}
 
 // Now print out event information
 const run_info_str = `Run: ${event.nrunsk} 

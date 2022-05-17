@@ -24,6 +24,11 @@
         top: 50%;
         right: 10px;
       }
+      .button.reset_view {
+        position: absolute;
+        bottom: 10px;
+        text-align: center;
+      }
       .button:hover {
         background-color: rgb(41, 48, 58);
         cursor: pointer;
@@ -71,6 +76,8 @@
 
     <button class="button prev" onclick="FetchAndReload('/prev')"><</button>
     <button class="button next" onclick="FetchAndReload('/next')">></button>
+    <!-- <button class="button reset_view" onclick="ResetView()">Reset</button> -->
+    <button class="button reset_view" id="reset_button">Reset</button>
     <div class="rfooter">
       WCEVD by Alex Goldsack
     </div>
