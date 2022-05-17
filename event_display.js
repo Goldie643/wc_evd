@@ -227,7 +227,15 @@ animate();
 
 
 // Now print out event information
-const run_info_str = `Run: ${event.nrunsk}\n Subrun: ${event.nsubsk}\n Event: ${event.nevsk}`;
+const run_info_str = `Run: ${event.nrunsk} 
+    Subrun: ${event.nsubsk} 
+    Event: ${event.nevsk}
+    Date: ${event.year}-${event.month}-${event.day}
+
+    Trigid: ${event.trigid}
+    BONSAI Energy: ${event.bsenergy.toFixed(3)} MeV
+
+    `;
 const run_info = document.getElementById("run_info");
 const run_text = document.createTextNode(run_info_str);
 
