@@ -215,10 +215,15 @@ PlotVTX( scene, event )
 PlotXYZ( xyz_scene )
 
 // Setup a default camera (other control types like Ortho are available).
-const camera = new THREE.PerspectiveCamera( 45, window.innerWidth /
-    window.innerHeight, 1, 100000 );
-const xyz_camera = new THREE.PerspectiveCamera( 45, window.innerWidth /
-    window.innerHeight, 1, 100000 );
+const aspect = window.innerWidth / window.innerHeight;
+const camera = new THREE.PerspectiveCamera( 45, aspect, 1, 100000 );
+// const xyz_aspect = xyz_container.width / xyz_container.height
+const xyz_aspect = 1;
+const d = 500;
+// const xyz_camera = new THREE.OrthographicCamera( - window.innerWidth /
+//     window.innerHeight, 1, 100000 );
+const xyz_camera = new THREE.OrthographicCamera( -d*xyz_aspect, d*xyz_aspect, d,
+    -d, 1, 100000 );
 
 // Control camera with orbit controls
 const controls = new OrbitControls( camera, renderer.domElement );
@@ -231,7 +236,9 @@ camera.position.set( 0, 8000, 3000 );
 camera.lookAt( 0, 0, 0 );
 xyz_camera.position.set( 0, 80000, 30000 );
 xyz_camera.lookAt( 0, 0, 0 );
-xyz_camera.setFocalLength(1500)
+
+controls.saveState()
+xyz_controls.saveState()
 
 // controls.saveState();
 controls.update()
@@ -250,10 +257,8 @@ const reset_btn = document.getElementById("reset_button");
 reset_btn.addEventListener("click", resetView)
 
 function resetView() { 
-    camera.position.set( 0, 8000, 3000 );
-    camera.lookAt( 0, 0, 0 );
-    xyz_camera.position.set( 0, 80000, 30000 );
-    xyz_camera.lookAt( 0, 0, 0 );
+    controls.reset()
+    xyz_controls.reset()
     return
 }
 
