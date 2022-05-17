@@ -231,7 +231,7 @@ camera.position.set( 0, 8000, 3000 );
 camera.lookAt( 0, 0, 0 );
 xyz_camera.position.set( 0, 80000, 30000 );
 xyz_camera.lookAt( 0, 0, 0 );
-xyz_camera.setFocalLength(2000)
+xyz_camera.setFocalLength(1500)
 
 // controls.saveState();
 controls.update()
@@ -252,6 +252,8 @@ reset_btn.addEventListener("click", resetView)
 function resetView() { 
     camera.position.set( 0, 8000, 3000 );
     camera.lookAt( 0, 0, 0 );
+    xyz_camera.position.set( 0, 80000, 30000 );
+    xyz_camera.lookAt( 0, 0, 0 );
     return
 }
 
