@@ -279,13 +279,19 @@ function resetView() {
 
 // Print event number into input field, get it to get a specific event
 const event_no = document.getElementById("event_no");
+const event_no_err = document.getElementById("event_no_err")
 event_no.value = event.nevsk;
 event_no.addEventListener("keyup", function (e) {
     if (e.key === "Enter") {
         const event_query = `?event=${event_no.value}`
         fetch(event_query).then(response => {
+            console.log(response)
             if (response.ok) {
+                event_no_err.innerHTML = ""
                 window.location.replace('/')
+            }
+            else {
+                event_no_err.innerHTML = "Event not found!"
             }
         })
     }

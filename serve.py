@@ -64,9 +64,14 @@ class WCEVDRequestHandler(http.server.SimpleHTTPRequestHandler):
     # Get the event with the passed nevsk
     def event(self, nevsk):
         # Get index matching the passed nevsk
-        event_i = np.where(self.df["nevsk"] == nevsk)[0][0]
-
-        self.event_i = event_i
+        event_i = np.where(self.df["nevsk"] == nevsk)[0]
+        if len(event_i) > 0:
+            event_i = event_i[0]
+            self.event_i = event_i
+        else:
+            self.send_response(404)
+            self.end_headers()
+            return
 
         self.send_response(200)
         self.send_header("Content-type", "text/html")
