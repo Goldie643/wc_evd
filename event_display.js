@@ -131,13 +131,14 @@ function PlotVTX( scene, vtx ) {
     const mat = new THREE.MeshBasicMaterial( {color: 0xFF0000} );
     const mesh = new THREE.Mesh( geom, mat );
 
-    mesh.position.set( vtx.x, vtx.y, vtx.z );
+    const origin = new THREE.Vector3( vtx.bx, vtx.by, vtx.bz );
+
     scene.add( mesh );
+    mesh.position.copy( origin );
 
     // Now add an arrow for direction
     const dir = new THREE.Vector3( vtx.x_dir, vtx.y_dir, vtx.z_dir );
     dir.normalize();
-    const origin = new THREE.Vector3( vtx.x, vtx.y, vtx.z );
     const length = 1000;
     const hex = 0xFF0000;
     const arrowHelper = new THREE.ArrowHelper( dir, origin, length, hex );
@@ -152,19 +153,19 @@ function PlotVTX( scene, vtx ) {
         transparent: true, opacity: 0.2, side: THREE.DoubleSide} );
     const cone = new THREE.Mesh( cone_geom, cone_mat );
 
-    // Align with event dir
-    // First point in +ve x
-    cone.rotateZ( Math.PI / 2 )
-    // Then rotate according to direction angles from BONSAI
-    cone.rotateY( vtx.phi )
-    // TODO: This shouldn't be negative, but it works *most* of the time
-    // A sign must be messed up somewhere
-    cone.rotateZ( - vtx.theta )
+    // Move cone to origin, point along direction vector
+    cone.position.copy( origin );
+    const dir_offset = new THREE.Vector3(
+        vtx.bx + (vtx.x_dir*cone_l/2),
+        vtx.by + (vtx.y_dir*cone_l/2),
+        vtx.bz + (vtx.z_dir*cone_l/2)
+    )
+    cone.lookAt( dir_offset )
+    cone.rotateX( - Math.PI / 2 )
 
-    cone.position.set( 
-        vtx.x + (vtx.x_dir*cone_l/2),
-        vtx.y + (vtx.y_dir*cone_l/2),
-        vtx.z + (vtx.z_dir*cone_l/2)
+    // Move alond direction by cone length/2 to put tip of cone on vtx
+    cone.position.copy( 
+        dir_offset
     );
 
     // Clip from cylinder
@@ -182,6 +183,7 @@ function PlotVTX( scene, vtx ) {
     const cone_clip = CSG.toMesh( bsp_result, cone.matrix, cone.material )
 
     scene.add( cone_clip )
+    // scene.add( cone )
     
     return
 }

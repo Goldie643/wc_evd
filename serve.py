@@ -77,7 +77,9 @@ class WCEVDRequestHandler(http.server.SimpleHTTPRequestHandler):
 
 # Cols needed from file
 cols = [
-    "BONSAI*",
+    # "BONSAI*", # Online
+    "bsvertex*",
+    "bsdir*",    
     "cable",
     "t",
     "q",
@@ -94,21 +96,29 @@ cols = [
 f = sys.argv[1]
 f = uproot.open(f)["wit"]
 df = f.pandas.df(cols, flatten=False)
+df = df[df["bsenergy"] > 5]
 df = df.rename(columns={
-    "BONSAI.bx" : "x",
-    "BONSAI.by" : "y",
-    "BONSAI.bz" : "z",
-    "BONSAI.btheta" : "theta",
-    "BONSAI.bphi" : "phi",
+    # "BONSAI.bx" : "x",
+    # "BONSAI.by" : "y",
+    # "BONSAI.bz" : "z",
+    # "BONSAI.btheta" : "theta",
+    # "BONSAI.bphi" : "phi",
+    "bsvertex[4][0]" : "bx",
+    "bsvertex[4][1]" : "by",
+    "bsvertex[4][2]" : "bz",
+    "bsvertex[4][3]" : "bt",
+    "bsdir[3][0]" : "x_dir",
+    "bsdir[3][1]" : "y_dir",
+    "bsdir[3][2]" : "z_dir",
     "swtrigger.trigid" : "trigid",
     "ndaysk[3][0]" : "year",
     "ndaysk[3][1]" : "month",
     "ndaysk[3][2]" : "day"
 })
 
-df["x_dir"] = np.cos(df["theta"])
-df["y_dir"] = np.sin(df["theta"])
-df["z_dir"] = np.sin(df["phi"])
+# df["x_dir"] = np.cos(df["theta"])
+# df["y_dir"] = np.sin(df["theta"])
+# df["z_dir"] = np.sin(df["phi"])
 
 # Create an object of the above class
 handler = WCEVDRequestHandler(df)
