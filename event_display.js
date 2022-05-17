@@ -263,19 +263,33 @@ function resetView() {
 }
 
 // Now print out event information
-const run_info_str = `Run: ${event.nrunsk} 
-    Subrun: ${event.nsubsk} 
-    Event: ${event.nevsk}
-    Date: ${event.year}-${event.month}-${event.day}
+// const run_info_str = `Run: ${event.nrunsk} 
+//     Subrun: ${event.nsubsk} 
+//     Event: ${event.nevsk}
+//     Date: ${event.year}-${event.month}-${event.day}
 
-    Trigid: ${event.trigid}
-    BONSAI Energy: ${event.bsenergy.toFixed(3)} MeV
+//     Trigid: ${event.trigid}
+//     BONSAI Energy: ${event.bsenergy.toFixed(3)} MeV
 
-    `;
-const run_info = document.getElementById("run_info");
-const run_text = document.createTextNode(run_info_str);
+//     `;
+// const run_info = document.getElementById("run_info");
+// const run_text = document.createTextNode(run_info_str);
 
-run_info.appendChild(run_text);
+// run_info.appendChild(run_text);
+
+// Print event number into input field, get it to get a specific event
+const event_no = document.getElementById("event_no");
+event_no.value = event.nevsk;
+event_no.addEventListener("keyup", function (e) {
+    if (e.key === "Enter") {
+        const event_query = `?event=${event_no.value}`
+        fetch(event_query).then(response => {
+            if (response.ok) {
+                window.location.replace('/')
+            }
+        })
+    }
+});
 
 // Plot Q and T histograms
 const thist = {

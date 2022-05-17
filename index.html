@@ -4,6 +4,14 @@
     <meta charset="utf-8">
     <title>WCEVD</title>
     <style>
+      input[type=text] {
+        background-color: transparent;
+        border-style: none;
+        font-size: large;
+      }
+      input[type=text]:focus {
+        outline: none;
+      }
       .button {
         border-style: solid;
         background-color: transparent;
@@ -76,6 +84,15 @@
         text-align: left;
         vertical-align: middle;
       }
+      #event_no {
+        position: absolute;
+        top: 40%;
+        left: 15%;
+        white-space: pre-line;
+        width: flex; 
+        text-align: left;
+        vertical-align: middle;
+      }
       * {
         font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
           'Lucida Sans', Arial, sans-serif;
@@ -93,17 +110,14 @@
       WCEVD by Alex Goldsack
     </div>
 
-    <div id="evd_renderer">
-    </div>
-    <div id="xyz_renderer">
-    </div>
-    <p id="run_info">
-    </p>
+    <div id="evd_renderer"></div>
+    <div id="xyz_renderer"></div>
+    <!-- <p id="run_info">
+    </p> -->
+    <input type=text id="event_no"></input>
 
-    <div id="thist_div">
-    </div>
-    <div id="qhist_div">
-    </div>
+    <div id="thist_div"></div>
+    <div id="qhist_div"></div>
 
     <script type="importmap">
     {
