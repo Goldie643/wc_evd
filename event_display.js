@@ -275,11 +275,11 @@ const xyz_container = document.getElementById( "xyz_renderer" )
 // document.body.appendChild( container );
 
 // Setup renderer
-const renderer = new THREE.WebGLRenderer( {alpha: true} );
+const renderer = new THREE.WebGLRenderer( {alpha: true, antialias: true} );
 renderer.setSize( container.clientWidth, container.clientHeight );
 container.appendChild( renderer.domElement );
 
-const xyz_renderer = new THREE.WebGLRenderer( {alpha: true} );
+const xyz_renderer = new THREE.WebGLRenderer( {alpha: true, antialias: true} );
 xyz_renderer.setSize( xyz_container.clientWidth, xyz_container.clientHeight );
 xyz_container.appendChild( xyz_renderer.domElement );
 
