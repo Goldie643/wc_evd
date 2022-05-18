@@ -262,6 +262,18 @@ function resetView() {
     return
 }
 
+function onWindowResize() {
+    camera.aspect = container.clientWidth / container.clientHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize( container.clientWidth, container.clientHeight );
+
+    xyz_camera.aspect = xyz_container.clientWidth / xyz_container.clientHeight;
+    xyz_camera.updateProjectionMatrix();
+    xyz_renderer.setSize( xyz_container.clientWidth, xyz_container.clientHeight );
+}
+
+window.onresize = () => onWindowResize();
+
 // Now print out event information
 // const run_info_str = `Run: ${event.nrunsk} 
 //     Subrun: ${event.nsubsk} 
