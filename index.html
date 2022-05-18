@@ -62,7 +62,7 @@
       }
       #xyz_renderer {
         position: absolute; 
-        bottom: 100px;
+        bottom: 10%;
         left: 15%;
         width: 200px;
         height: 200px;
@@ -73,17 +73,21 @@
         top: 40%;
         left: 15%;
         white-space: pre-line;
-        width: 400px;
+        width: flex;
         text-align: left;
         vertical-align: middle;
       }
-      label {
-        font-size: large;
+      #run_info_text {
+        margin: 0;
+        padding: 0;
       }
+      /* label {
+        font-size: large;
+      } */
       input {
         background-color: transparent;
         border-style: none;
-        font-size: large;
+        font-size: medium;
       }
       /* Chrome, Safari, Edge, Opera */
       input::-webkit-outer-spin-button,
@@ -139,6 +143,7 @@
     <!-- <p id="run_info">
     </p> -->
     <div id="run_info">
+      <p id="run_info_text"></p>
       <nobr>
       <label>Event</label>
       </nobr><input type="number" step="1" id="event_no"></input>
