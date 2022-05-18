@@ -127,6 +127,79 @@ function PlotPMTs( scene, pmt_info, event ) {
     return
 }
 
+
+function PlotPMTs2D( scene, pmt_info, event ) {
+    const pmt_geom = new THREE.SphereGeometry( 25, 32, 16 );
+    const nohit_mat = new THREE.MeshBasicMaterial( {color: 0x808080,
+        transparent: true, opacity: 0.1} );
+    const hit_mat = new THREE.MeshBasicMaterial( {color: 0xFFFF00} );
+
+    const top_pmts = pmt_info.filter(pmt => pmt.z > SKHH-1);
+    const bot_pmts = pmt_info.filter(pmt => pmt.z < -SKHH+1);
+    const wall_pmts = pmt_info.filter(pmt => pmt.z > -SKHH+1 && pmt.z < SKHH-1);
+
+    function AddPMTsToScene( pmt_sub_info, offset=0, wall=false ){
+        for (let pmt of pmt_sub_info) {
+            let mat = nohit_mat;
+            if (event.cable.includes( pmt.cable )) {
+                mat = hit_mat;
+                // Don't plot hit PMTs
+                // continue;
+            };
+            const mesh = new THREE.Mesh( pmt_geom, mat );
+            if (wall){
+                // let theta = Math.atan( pmt.y/pmt.x );
+                // Avoid tan cause of near-infinites.
+                let theta = Math.acos( pmt.x / SKR );
+                if (pmt.y <= 0) {
+                    theta = theta - Math.PI;
+                } else {
+                    theta = -theta + Math.PI;
+                }
+                theta = theta - Math.PI/16;
+                mesh.position.set( theta*SKR, pmt.z, 0 );
+            }
+            else{
+                mesh.position.set( pmt.x, pmt.y + offset, 0 );
+            }
+            scene.add( mesh );
+        }
+    }
+
+    AddPMTsToScene( top_pmts, 2*SKHH );
+    AddPMTsToScene( bot_pmts, -2*SKHH );
+    AddPMTsToScene( wall_pmts, 0, true );
+
+    return
+
+    function addSinglePMT( x, y, c ){
+        const mat = new THREE.MeshBasicMaterial( {color: c} );
+        let theta = Math.acos( x / 1 );
+        // Minus so it's as IRL, not just by theta convention
+        if ( y <= 0 ) {
+            theta = theta - Math.PI;
+        } else {
+            theta = -theta + Math.PI;
+        }
+        theta = theta + Math.PI/8;
+        const mesh = new THREE.Mesh( pmt_geom, mat );
+        mesh.position.set( theta*SKR, 0, 0 );
+        scene.add( mesh );
+
+    }
+    const a = Math.sqrt(1/2)
+    addSinglePMT( 1, 0, "white");
+    addSinglePMT( a, -a, "pink");
+    addSinglePMT( 0, -1, "red");
+    addSinglePMT( -a, -a, "black");
+    addSinglePMT( -1, 0, "green");
+    addSinglePMT( -a, a, "teal");
+    addSinglePMT( 0, 1, "blue");
+    addSinglePMT( a, a, "light blue");
+
+    return
+}
+
 function PlotVTX( scene, vtx ) {
     const geom = new THREE.SphereGeometry( 25, 32, 16 );
     const mat = new THREE.MeshBasicMaterial( {color: 0xFF0000} );
@@ -210,16 +283,24 @@ const xyz_scene =  new THREE.Scene();
 // Add all the meshes to the scene
 // PlotDetector( scene );
 // PlotHits( scene, hits );
-PlotPMTs( scene, pmt_info, event );
-PlotVTX( scene, event )
-PlotXYZ( xyz_scene )
+
+PlotPMTs2D( scene, pmt_info, event );
+// PlotPMTs( scene, pmt_info, event );
+// PlotVTX( scene, event )
+// PlotXYZ( xyz_scene )
 
 // Setup a default camera (other control types like Ortho are available).
+const d = 500;
 const aspect = window.innerWidth / window.innerHeight;
-const camera = new THREE.PerspectiveCamera( 45, aspect, 1, 100000 );
+// const camera = new THREE.PerspectiveCamera( 45, aspect, 1, 100000 );
+// const camera = new THREE.OrthographicCamera( -d*aspect, d*aspect, d,
+//     -d, 1, 100000 );
+const camera = new THREE.OrthographicCamera( -window.innerWidth, window.innerWidth, window.innerHeight,
+    -window.innerHeight, 1, 100000 );
+camera.zoom = 0.2
+camera.updateProjectionMatrix();
 // const xyz_aspect = xyz_container.width / xyz_container.height
 const xyz_aspect = 1;
-const d = 500;
 // const xyz_camera = new THREE.OrthographicCamera( - window.innerWidth /
 //     window.innerHeight, 1, 100000 );
 const xyz_camera = new THREE.OrthographicCamera( -d*xyz_aspect, d*xyz_aspect, d,
@@ -232,9 +313,11 @@ const xyz_controls = new OrbitControls( xyz_camera, renderer.domElement );
 xyz_controls.enableZoom = false
 xyz_controls.enablePan = false
 
-camera.position.set( 0, 8000, 3000 );
+// camera.position.set( 0, 8000, 3000 );
+camera.position.set( 0, 0, 30000 );
 camera.lookAt( 0, 0, 0 );
-xyz_camera.position.set( 0, 80000, 30000 );
+// xyz_camera.position.set( 0, 80000, 30000 );
+xyz_camera.position.set( 0, 0, 30000 );
 xyz_camera.lookAt( 0, 0, 0 );
 
 controls.saveState()
