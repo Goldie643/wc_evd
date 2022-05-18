@@ -39,6 +39,7 @@
         bottom: 8px;
         right: 16px;
         text-align: right;
+        font-size: small;
       }
       #thist_div{
         position: absolute;
@@ -80,6 +81,15 @@
       #run_info_text {
         margin: 0;
         padding: 0;
+      }
+      #instructions {
+        position: absolute;
+        bottom: 8px;
+        margin-left: 15%;
+        margin-right: 15%;
+        width: 70%;
+        text-align: center;
+        font-size: small;
       }
       /* label {
         font-size: large;
@@ -135,7 +145,13 @@
     <button class="button next" onclick="FetchAndReload('/next')">></button>
     <button class="button reset_view" id="reset_button">Reset</button>
     <div class="rfooter">
-      WCEVD by Alex Goldsack
+      <img src="favicon.png" style="width:20px;height:20px"> WCEVD by Alex Goldsack
+    </div>
+
+    <div id="instructions">
+      Rotate by clicking and dragging, pan by right clicking, zoom by scrolling
+      in and out. Click the arrows either side of the screen go to next and previous
+      events or enter an event number on the event info on the left and press enter.
     </div>
 
     <div id="evd_renderer"></div>
