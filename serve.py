@@ -82,8 +82,6 @@ class WCEVDRequestHandler(http.server.SimpleHTTPRequestHandler):
         return
 
     def do_GET(self):
-        if self.path == '/favicon.ico':
-            return
         if self.path == '/':
             self.path = 'index.html'
         elif self.path == "/event.json":
