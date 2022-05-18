@@ -129,6 +129,9 @@ function PlotPMTs( scene, pmt_info, event ) {
 
 
 function PlotPMTs2D( scene, pmt_info, event ) {
+    const t_max = Math.max(...event.t);
+    const t_min = Math.min(...event.t);
+
     const pmt_geom = new THREE.SphereGeometry( 25, 32, 16 );
     const nohit_mat = new THREE.MeshBasicMaterial( {color: 0x808080,
         transparent: true, opacity: 0.1} );
@@ -142,9 +145,13 @@ function PlotPMTs2D( scene, pmt_info, event ) {
         for (let pmt of pmt_sub_info) {
             let mat = nohit_mat;
             if (event.cable.includes( pmt.cable )) {
-                mat = hit_mat;
-                // Don't plot hit PMTs
-                // continue;
+                // Find index of pmt in the hits
+                const cable_i = event.cable.findIndex((x) => x == pmt.cable);
+                let t = event.t[cable_i];
+                // Scale to a fraction of max and min
+                let t_scaled = (t-t_min)/(t_max-t_min)
+                mat = new THREE.MeshBasicMaterial( 
+                    {color: PickColour(t_scaled)} );
             };
             const mesh = new THREE.Mesh( pmt_geom, mat );
             if (wall){
