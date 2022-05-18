@@ -65,13 +65,18 @@ class WCEVDRequestHandler(http.server.SimpleHTTPRequestHandler):
     def event(self, nevsk):
         # Get index matching the passed nevsk
         event_i = np.where(self.df["nevsk"] == nevsk)[0]
-        if len(event_i) > 0:
-            event_i = event_i[0]
-            self.event_i = event_i
-        else:
+
+        # If no matches or what's passed isn't an int, send 404
+        try:
+            event_i = int(event_i[0])
+        except (ValueError, IndexError) as e:
+            print("Passed event number does not exist in file.")
             self.send_response(404)
             self.end_headers()
             return
+
+        # Otherwise, set the event_i and go and make it
+        self.event_i = event_i
 
         self.send_response(200)
         self.send_header("Content-type", "text/html")

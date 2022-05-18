@@ -5,14 +5,6 @@
     <link rel="icon"  type="image/x-icon" href="/favicon.png">
     <title>WCEVD</title>
     <style>
-      input[type=text] {
-        background-color: transparent;
-        border-style: none;
-        font-size: large;
-      }
-      input[type=text]:focus {
-        outline: none;
-      }
       .button {
         border-style: solid;
         background-color: transparent;
@@ -85,19 +77,40 @@
         text-align: left;
         vertical-align: middle;
       }
+      label {
+        font-size: large;
+      }
+      input {
+        background-color: transparent;
+        border-style: none;
+        font-size: large;
+      }
+      /* Chrome, Safari, Edge, Opera */
+      input::-webkit-outer-spin-button,
+      input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+      /* Firefox */
+      input[type=number] {
+        -moz-appearance: textfield;
+      }
+      input:focus {
+        outline: none;
+      }
       #event_no {
-        position: absolute;
+        /* position: absolute;
         top: 40%;
-        left: 15%;
+        left: 15%; */
         white-space: pre-line;
-        width: flex; 
+        width: 100px; 
         text-align: left;
         vertical-align: middle;
       }
       #event_no_err {
-        position: absolute;
+        /* position: absolute;
         top: 40%;
-        left: 20%;
+        left: 20%; */
         white-space: pre-line;
         width: flex; 
         text-align: left;
@@ -125,8 +138,13 @@
     <div id="xyz_renderer"></div>
     <!-- <p id="run_info">
     </p> -->
-    <input type=text id="event_no"></input>
-    <label for="event_no", id="event_no_err"></label>
+    <div id="run_info">
+      <nobr>
+      <label>Event</label>
+      </nobr><input type="number" step="1" id="event_no"></input>
+      <label for="event_no", id="event_no_err"></label>
+      </nobr>
+    </div>
 
     <div id="thist_div"></div>
     <div id="qhist_div"></div>
