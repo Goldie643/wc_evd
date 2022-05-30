@@ -2,7 +2,6 @@ import sys
 import uproot
 import http.server
 import socketserver
-import numpy as np
 from urllib import parse
 
 class WCEVDRequestHandler(http.server.SimpleHTTPRequestHandler):
@@ -122,28 +121,97 @@ cols = [
     "bsenergy"
 ]
 
-# Prep the file to plot events from
-f = sys.argv[1]
-f = uproot.open(f)["wit"]
-df = f.pandas.df(cols, flatten=False)
-df = df.rename(columns={
-    # "BONSAI.bx" : "x",
-    # "BONSAI.by" : "y",
-    # "BONSAI.bz" : "z",
-    # "BONSAI.btheta" : "theta",
-    # "BONSAI.bphi" : "phi",
-    "bsvertex[4][0]" : "bx",
-    "bsvertex[4][1]" : "by",
-    "bsvertex[4][2]" : "bz",
-    "bsvertex[4][3]" : "bt",
-    "bsdir[3][0]" : "x_dir",
-    "bsdir[3][1]" : "y_dir",
-    "bsdir[3][2]" : "z_dir",
-    "swtrigger.trigid" : "trigid",
-    "ndaysk[3][0]" : "year",
-    "ndaysk[3][1]" : "month",
-    "ndaysk[3][2]" : "day"
-})
+if len(sys.argv) > 1:
+    # Prep the file to plot events from
+    f = sys.argv[1]
+    f = uproot.open(f)["wit"]
+    df = f.pandas.df(cols, flatten=False)
+    df = df.rename(columns={
+        # "BONSAI.bx" : "x",
+        # "BONSAI.by" : "y",
+        # "BONSAI.bz" : "z",
+        # "BONSAI.btheta" : "theta",
+        # "BONSAI.bphi" : "phi",
+        "bsvertex[4][0]" : "bx",
+        "bsvertex[4][1]" : "by",
+        "bsvertex[4][2]" : "bz",
+        "bsvertex[4][3]" : "bt",
+        "bsdir[3][0]" : "x_dir",
+        "bsdir[3][1]" : "y_dir",
+        "bsdir[3][2]" : "z_dir",
+        "swtrigger.trigid" : "trigid",
+        "ndaysk[3][0]" : "year",
+        "ndaysk[3][1]" : "month",
+        "ndaysk[3][2]" : "day"
+    })
+else:
+    import random
+    import numpy as np
+    import pandas as pd
+    print("GENERATING RANDOM EVENTS")
+
+    n_rand_events = 10
+    skr = 1690 # Radius of SK
+    skhh = 1810 # Half height of SK
+    # Generate random events
+    brs = [random.uniform(0, skr*skr) for x in range(n_rand_events)]
+    brs = [np.sqrt(br) for br in brs]
+    bys = [br*np.cos(br) for br in brs]
+    bxs = [br*np.sin(br) for br in brs]
+    bzs = [random.uniform(-skhh, skhh) for x in range(n_rand_events)]
+    bts = [0]*n_rand_events
+    x_dirs = [random.uniform(0, 1) for x in range(n_rand_events)]
+    y_dirs = [random.uniform(0, 1) for x in range(n_rand_events)]
+    z_dirs = [random.uniform(0, 1) for x in range(n_rand_events)]
+
+    for i,xd,yd,zd in zip(range(n_rand_events), x_dirs, y_dirs, z_dirs):
+        r = np.sqrt(xd*xd+yd*yd+zd*zd)
+        x_dirs[i] = xd/r
+        y_dirs[i] = yd/r
+        z_dirs[i] = zd/r
+
+    # Make it obvious the event is random
+    rand_txt = "RANDOM_EVENT"
+    trigids = [rand_txt]*n_rand_events
+    nrunsks = [rand_txt]*n_rand_events
+    nsubsks = [rand_txt]*n_rand_events
+    nevsks = list(range(n_rand_events))
+    years = ["1996"]*n_rand_events
+    months = ["01"]*n_rand_events
+    days = ["01"]*n_rand_events
+
+    nhits = [random.randint(20,150) for x in range(n_rand_events)]
+    bses = [x/10 for x in nhits]
+    cables = []
+    ts = []
+    qs = []
+    for nhit in nhits:
+        cables.append([random.randint(1,11146) for x in range(nhit)])
+        ts.append([random.gauss(0,10) for x in range(nhit)])
+        q_temp = [random.gauss(0,0.5) for x in range(nhit)]
+        qs.append([np.abs(q) for q in q_temp])
+
+    df = pd.DataFrame({
+        "bx" : bxs,
+        "by" : bys,
+        "bz" : bzs,
+        "bt" : bts,
+        "bsenergy" : bses,
+        "x_dr" : x_dirs,
+        "y_dr" : y_dirs,
+        "z_dr" : z_dirs,
+        "trigid" : trigids,
+        "nrunsk" : nrunsks,
+        "nsubsk" : nsubsks,
+        "nevsk" : nevsks,
+        "year" : years,
+        "month" : months,
+        "day" : days,
+        "cable" : cables,
+        "t" : ts,
+        "q" : qs
+    }
+    )
 
 # df["x_dir"] = np.cos(df["theta"])
 # df["y_dir"] = np.sin(df["theta"])
@@ -152,7 +220,7 @@ df = df.rename(columns={
 # Create an object of the above class
 handler = WCEVDRequestHandler(df)
 
-PORT = 8001
+PORT = 8000
 my_server = socketserver.TCPServer(("", PORT), handler)
 
 # Star the server
