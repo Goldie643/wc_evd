@@ -1,14 +1,16 @@
 import * as THREE from "three"
-import CSG from "./three-csg.js"
+import CSG from "./src/three-csg.js"
+import { OrbitControls } from "./src/OrbitControls.js"
+import { EffectComposer } from "./src/EffectComposer.js"
+import { OutlinePass } from "./src/OutlinePass.js"
 import { pmt_info } from "./pmt_prod_year.js"
-import { OrbitControls } from "./OrbitControls.js"
 
 const SKR = 1690; // Radius of SK
 const SKHH = 1810; // Half height of SK
 // Longest distance in tank
 const MAX_R = Math.sqrt((2*1690)*(2*1690) + (2*1810)*(2*180)) 
 
-const event = await fetch("event.json").then(response => response.json());
+const event_data = await fetch("event.json").then(response => response.json());
 
 // Redefine z to be upwards as in SK's convention
 THREE.Object3D.DefaultUp = new THREE.Vector3(0, 0, 1);
@@ -123,6 +125,7 @@ function PlotPMTs( scene, pmt_info, event ) {
             {color: PickColour(t_scaled)} );
         let mat = hit_mat;
         const mesh = new THREE.Mesh( pmt_geom, mat );
+        mesh.name = "HIT";
         mesh.position.set( pmt.x, pmt.y, pmt.z );
         hit_pmts.push( mesh ); 
         scene.add( mesh );
@@ -148,6 +151,7 @@ function PlotPMTs2D( scene, pmt_info, event ) {
     function AddPMTsToScene( pmt_sub_info, offset=0, wall=false ){
         for (let pmt of pmt_sub_info) {
             let mat = nohit_mat;
+            let name = "";
             if (event.cable.includes( pmt.cable )) {
                 // Find index of pmt in the hits
                 const cable_i = event.cable.findIndex((x) => x == pmt.cable);
@@ -156,8 +160,10 @@ function PlotPMTs2D( scene, pmt_info, event ) {
                 let t_scaled = (t-t_min)/(t_max-t_min)
                 mat = new THREE.MeshBasicMaterial( 
                     {color: PickColour(t_scaled)} );
+                name = "HIT";
             };
             const mesh = new THREE.Mesh( pmt_geom, mat );
+            mesh.name = name;
             if (wall){
                 // let theta = Math.atan( pmt.y/pmt.x );
                 // Avoid tan cause of near-infinites.
@@ -296,10 +302,10 @@ const xyz_scene =  new THREE.Scene();
 // PlotHits( scene, hits );
 
 // PlotPMTs2D( scene, pmt_info, event );
-const pmts = PlotPMTs( scene, pmt_info, event );
+const pmts = PlotPMTs( scene, pmt_info, event_data );
 const hit_pmts = pmts[0];
 const nohit_pmts = pmts[1];
-PlotVTX( scene, event )
+PlotVTX( scene, event_data )
 PlotXYZ( xyz_scene )
 
 // Setup a default camera (other control types like Ortho are available).
@@ -337,6 +343,15 @@ controls.saveState()
 xyz_controls.saveState()
 
 controls.update()
+
+const composer = new EffectComposer( renderer );
+const outlinePass = new OutlinePass(new THREE.Vector2(container.clientWidth,
+    container.clientHeight), scene, camera);
+composer.addPass( outlinePass );
+outlinePass.edgeStrength = 2;
+// outlinePass.edgeGlow = params.edgeGlow;
+outlinePass.visibleEdgeColor.set(0xffffff);
+// outlinePass.hiddenEdgeColor.set(0xffffff);
 
 // renderer.render( scene, camera );
 function animate() {
@@ -377,7 +392,7 @@ function changeView() {
     controls.reset()
     xyz_controls.reset()
     if ( view == "3D" ) {
-        PlotPMTs2D( scene, pmt_info, event );
+        PlotPMTs2D( scene, pmt_info, event_data );
         camera.position.set( 0, 0, 100000 );
         camera.lookAt( 0, 0, 0 );
         camera.fov = 1.5;
@@ -386,8 +401,8 @@ function changeView() {
         controls.saveState()
         xyz_controls.saveState()
     } else {
-        PlotPMTs( scene, pmt_info, event );
-        PlotVTX( scene, event )
+        PlotPMTs( scene, pmt_info, event_data );
+        PlotVTX( scene, event_data )
         PlotXYZ( xyz_scene )
         view = "3D";
         camera.position.set( 0, 8000, 3000 );
@@ -415,13 +430,44 @@ function onWindowResize() {
 
 window.onresize = () => onWindowResize();
 
-// Now print out event information
-const run_info_str = `Run: ${event.nrunsk} 
-    Subrun: ${event.nsubsk} 
-    Date: ${event.year}-${event.month}-${event.day}
 
-    Trigid: ${event.trigid}
-    BONSAI Energy: ${event.bsenergy.toFixed(3)} MeV
+let raycaster = new THREE.Raycaster();
+let mouse = new THREE.Vector2()
+
+function onClick() {
+    mouse.x = (event.clientX / container.clientWidth) * 2 - 1;
+    mouse.y = -(event.clientY / container.clientHeight) * 2 + 1;
+  
+    raycaster.setFromCamera(mouse, camera);
+  
+    var intersects = raycaster.intersectObjects(scene.children, false);
+  
+    if (intersects.length > 0) {
+        for ( let i = 0; i < intersects.length; i++) {
+            const object = intersects[i].object;
+            if ( object.name == "HIT" ){
+                console.log(mouse)
+                outlinePass.selectedObjects = [object];
+                // object.material.color.set( "rgb(255,0,0)" );
+                // Don't want to set everything behind it too
+                break;
+            }
+        }
+    }
+      
+    renderer.render( scene, camera );
+    // composer.render( scene, camera );
+  }
+
+renderer.domElement.addEventListener('click', onClick, true);
+
+// Now print out event information
+const run_info_str = `Run: ${event_data.nrunsk} 
+    Subrun: ${event_data.nsubsk} 
+    Date: ${event_data.year}-${event_data.month}-${event_data.day}
+
+    Trigid: ${event_data.trigid}
+    BONSAI Energy: ${event_data.bsenergy.toFixed(3)} MeV
     `;
 const run_info = document.getElementById("run_info_text");
 const run_text = document.createTextNode(run_info_str);
@@ -431,7 +477,7 @@ run_info.appendChild(run_text);
 // Print event number into input field, get it to get a specific event
 const event_no = document.getElementById("event_no");
 const event_no_err = document.getElementById("event_no_err")
-event_no.value = event.nevsk;
+event_no.value = event_data.nevsk;
 event_no.addEventListener("keyup", function (e) {
     if (e.key === "Enter") {
         const event_query = `?event=${event_no.value}`
@@ -450,7 +496,7 @@ event_no.addEventListener("keyup", function (e) {
 
 // Plot Q and T histograms
 const thist = {
-    x: event.t,
+    x: event_data.t,
     type: "histogram",
 };
 const thist_layout = {
@@ -470,7 +516,7 @@ const tdata = [thist];
 Plotly.newPlot("thist_div", tdata, thist_layout);
 
 const qhist = {
-    x: event.q,
+    x: event_data.q,
     type: "histogram",
 };
 const qhist_layout = {
@@ -488,3 +534,6 @@ const qhist_layout = {
 }
 const qdata = [qhist];
 Plotly.newPlot("qhist_div", qdata, qhist_layout);
+
+// scene.matrixAutoUpdate = false;
+// scene.autoUpdate = false;
