@@ -30,6 +30,11 @@
         bottom: 10px;
         text-align: center;
       }
+      .button.change_view{
+        position: absolute;
+        bottom: 80px;
+        text-align: center;
+      }
       .button:hover {
         background-color: rgb(41, 48, 58);
         cursor: pointer;
@@ -144,6 +149,7 @@
     <button class="button prev" onclick="FetchAndReload('/prev')"><</button>
     <button class="button next" onclick="FetchAndReload('/next')">></button>
     <button class="button reset_view" id="reset_button">Reset</button>
+    <button class="button change_view" id="change_view_button">2D/3D</button>
     <div class="rfooter">
       <img src="favicon.png" style="width:20px;height:20px"> WCEVD by Alex Goldsack
     </div>

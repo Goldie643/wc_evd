@@ -95,6 +95,7 @@ function PlotPMTs( scene, pmt_info, event ) {
     const pmt_geom = new THREE.SphereGeometry( 25, 32, 16 );
     const nohit_mat = new THREE.MeshBasicMaterial( {color: 0x808080,
         transparent: true, opacity: 0.1} );
+    const nohit_pmts = [];
     for (let pmt of pmt_info) {
         let mat = nohit_mat;
         if (event.cable.includes( pmt.cable )) {
@@ -103,12 +104,14 @@ function PlotPMTs( scene, pmt_info, event ) {
         };
         const mesh = new THREE.Mesh( pmt_geom, mat );
         mesh.position.set( pmt.x, pmt.y, pmt.z );
+        nohit_pmts.push(mesh);
         scene.add( mesh );
     }
 
     // const hit_mat = new THREE.MeshBasicMaterial( {color: 0xFFFF00} );
     const t_max = Math.max(...event.t);
     const t_min = Math.min(...event.t);
+    const hit_pmts = [];
     // Loop through all hits
     for (let i = 0; i < event.cable.length; i++) {
         let cable = event.cable[i];
@@ -121,10 +124,11 @@ function PlotPMTs( scene, pmt_info, event ) {
         let mat = hit_mat;
         const mesh = new THREE.Mesh( pmt_geom, mat );
         mesh.position.set( pmt.x, pmt.y, pmt.z );
+        hit_pmts.push( mesh ); 
         scene.add( mesh );
     }
     
-    return
+    return [hit_pmts, nohit_pmts]
 }
 
 
@@ -291,19 +295,21 @@ const xyz_scene =  new THREE.Scene();
 // PlotDetector( scene );
 // PlotHits( scene, hits );
 
-PlotPMTs2D( scene, pmt_info, event );
-// PlotPMTs( scene, pmt_info, event );
-// PlotVTX( scene, event )
-// PlotXYZ( xyz_scene )
+// PlotPMTs2D( scene, pmt_info, event );
+const pmts = PlotPMTs( scene, pmt_info, event );
+const hit_pmts = pmts[0];
+const nohit_pmts = pmts[1];
+PlotVTX( scene, event )
+PlotXYZ( xyz_scene )
 
 // Setup a default camera (other control types like Ortho are available).
 const d = 500;
 const aspect = window.innerWidth / window.innerHeight;
-// const camera = new THREE.PerspectiveCamera( 45, aspect, 1, 100000 );
+const camera = new THREE.PerspectiveCamera( 10, aspect, 1, 10000000 );
 // const camera = new THREE.OrthographicCamera( -d*aspect, d*aspect, d,
 //     -d, 1, 100000 );
-const camera = new THREE.OrthographicCamera( -window.innerWidth, window.innerWidth, window.innerHeight,
-    -window.innerHeight, 1, 100000 );
+// const camera = new THREE.OrthographicCamera( -window.innerWidth, window.innerWidth, window.innerHeight,
+//     -window.innerHeight, 1, 100000 );
 camera.zoom = 0.2
 camera.updateProjectionMatrix();
 // const xyz_aspect = xyz_container.width / xyz_container.height
@@ -320,26 +326,25 @@ const xyz_controls = new OrbitControls( xyz_camera, renderer.domElement );
 xyz_controls.enableZoom = false
 xyz_controls.enablePan = false
 
-// camera.position.set( 0, 8000, 3000 );
-camera.position.set( 0, 0, 30000 );
+camera.position.set( 0, 8000, 3000 );
+// camera.position.set( 0, 0, 30000 );
 camera.lookAt( 0, 0, 0 );
-// xyz_camera.position.set( 0, 80000, 30000 );
-xyz_camera.position.set( 0, 0, 30000 );
+xyz_camera.position.set( 0, 80000, 30000 );
+// xyz_camera.position.set( 0, 0, 30000 );
 xyz_camera.lookAt( 0, 0, 0 );
 
 controls.saveState()
 xyz_controls.saveState()
 
-// controls.saveState();
 controls.update()
 
 // renderer.render( scene, camera );
 function animate() {
     controls.update()
     xyz_controls.update()
-	requestAnimationFrame( animate );
 	renderer.render( scene, camera );
 	xyz_renderer.render( xyz_scene, xyz_camera );
+	requestAnimationFrame( animate );
 };
 animate();
 
@@ -349,6 +354,52 @@ reset_btn.addEventListener("click", resetView)
 function resetView() { 
     controls.reset()
     xyz_controls.reset()
+    return
+}
+
+const view_btn = document.getElementById("change_view_button")
+view_btn.addEventListener("click", changeView)
+
+function clearScene( scene ) {
+    for (let i = scene.children.length - 1; i >= 0; i--) {
+        const child_type = scene.children[i].type;
+        if(child_type == "Mesh" || child_type == "ArrowHelper")
+            scene.remove(scene.children[i]);
+    }
+}
+
+let view = "3D";
+
+// Switch between 3D and 2D 
+function changeView() {
+    clearScene( scene );
+    clearScene( xyz_scene )
+    controls.reset()
+    xyz_controls.reset()
+    if ( view == "3D" ) {
+        PlotPMTs2D( scene, pmt_info, event );
+        camera.position.set( 0, 0, 100000 );
+        camera.lookAt( 0, 0, 0 );
+        camera.fov = 1.5;
+        camera.updateProjectionMatrix();
+        view = "2D";
+        controls.saveState()
+        xyz_controls.saveState()
+    } else {
+        PlotPMTs( scene, pmt_info, event );
+        PlotVTX( scene, event )
+        PlotXYZ( xyz_scene )
+        view = "3D";
+        camera.position.set( 0, 8000, 3000 );
+        camera.lookAt( 0, 0, 0 );
+        camera.fov = 10;
+        camera.updateProjectionMatrix();
+        xyz_camera.position.set( 0, 80000, 30000 );
+        xyz_camera.lookAt( 0, 0, 0 );
+        controls.saveState()
+        xyz_controls.saveState()
+    }
+
     return
 }
 
