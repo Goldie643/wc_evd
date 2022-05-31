@@ -384,6 +384,9 @@ function clearScene( scene ) {
 }
 
 let view = "3D";
+const lclk = THREE.MOUSE.LEFT;
+const rclk = THREE.MOUSE.RIGHT;
+const scrll = THREE.MOUSE.MIDDLE;
 
 // Switch between 3D and 2D 
 function changeView() {
@@ -391,15 +394,21 @@ function changeView() {
     clearScene( xyz_scene )
     controls.reset()
     xyz_controls.reset()
+    // If view is 3D, switch to 2D
     if ( view == "3D" ) {
+        // Plot the 2D evd, put camera above it
         PlotPMTs2D( scene, pmt_info, event_data );
         camera.position.set( 0, 0, 100000 );
         camera.lookAt( 0, 0, 0 );
+        // Put far away to simulate ortho camera
         camera.fov = 1.5;
         camera.updateProjectionMatrix();
         view = "2D";
+        // Easiest to just reset everything
         controls.saveState()
         xyz_controls.saveState()
+        // Unbind roll, make lclick uses for pan. Can still roll with shift+click, disabling camera rotation doesn't fix for some reason
+        controls.mouseButtons = {LEFT: rclk, MIDDLE: scrll, RIGHT: null};
     } else {
         PlotPMTs( scene, pmt_info, event_data );
         PlotVTX( scene, event_data )
@@ -413,6 +422,8 @@ function changeView() {
         xyz_camera.lookAt( 0, 0, 0 );
         controls.saveState()
         xyz_controls.saveState()
+        // Standard orbit controls
+        controls.mouseButtons = {LEFT: lclk, MIDDLE: scrll, RIGHT: rclk};
     }
 
     return
