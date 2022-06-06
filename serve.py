@@ -3,6 +3,7 @@ import uproot
 import http.server
 import socket
 import socketserver
+import getpass
 from urllib import parse
 
 class WCEVDRequestHandler(http.server.SimpleHTTPRequestHandler):
@@ -149,7 +150,7 @@ else:
     import random
     import numpy as np
     import pandas as pd
-    print("GENERATING RANDOM EVENTS")
+    print("NO DATA FILE GIVEN, GENERATING RANDOM EVENTS")
 
     n_rand_events = 10
     skr = 1690 # Radius of SK
@@ -214,20 +215,29 @@ else:
     }
     )
 
-# df["x_dir"] = np.cos(df["theta"])
-# df["y_dir"] = np.sin(df["theta"])
-# df["z_dir"] = np.sin(df["phi"])
-
 # Create an object of the above class
 handler = WCEVDRequestHandler(df)
 
 sock = socket.socket()
 sock.bind(("",0))
-PORT = sock.getsockname()[1]
+port = sock.getsockname()[1]
 sock.close()
 
-my_server = socketserver.TCPServer(("", PORT), handler)
+hname = socket.gethostname()
+uname = getpass.getuser()
 
-# Star the server
-print("Server started at localhost:" + str(PORT))
+my_server = socketserver.TCPServer(("", port), handler)
+
+# Start the server
+print("Server started on port: " + str(port))
+print()
+print("If running REMOTELY...")
+print("In another window on your local machine, type:") 
+print("ssh -L 8000:%s:%i %s@%s" % (hname,port,uname,hname))
+print("If 8000 doesn't work, try 8001.")
+print("Then open your browser and navigate to \"localhost:8000\" "
+    "(or 8001 if 8000 didn't work).")
+print()
+print("If running LOCALLY...")
+print("Open your browser and navigate to \"localhost:%i\"" % port)
 my_server.serve_forever()
