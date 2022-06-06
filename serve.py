@@ -1,6 +1,7 @@
 import sys
 import uproot
 import http.server
+import socket
 import socketserver
 from urllib import parse
 
@@ -220,7 +221,11 @@ else:
 # Create an object of the above class
 handler = WCEVDRequestHandler(df)
 
-PORT = 8000
+sock = socket.socket()
+sock.bind(("",0))
+PORT = sock.getsockname()[1]
+sock.close()
+
 my_server = socketserver.TCPServer(("", PORT), handler)
 
 # Star the server
