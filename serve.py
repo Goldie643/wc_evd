@@ -111,42 +111,16 @@ cols = [
     # "BONSAI*", # Online
     "bsvertex*",
     "bsdir*",    
-    "cable",
-    "t",
-    "q",
     "nrunsk",
     "nsubsk",
     "nevsk",
     "swtrigger*",
     "ndaysk*",
     # "ntimsk*", # Not stored properly in WIT
-    "bsenergy"
+    "bsenergy",
 ]
 
-if len(sys.argv) > 1:
-    # Prep the file to plot events from
-    f = sys.argv[1]
-    f = uproot.open(f)["wit"]
-    df = f.pandas.df(cols, flatten=False)
-    df = df.rename(columns={
-        # "BONSAI.bx" : "x",
-        # "BONSAI.by" : "y",
-        # "BONSAI.bz" : "z",
-        # "BONSAI.btheta" : "theta",
-        # "BONSAI.bphi" : "phi",
-        "bsvertex[4][0]" : "bx",
-        "bsvertex[4][1]" : "by",
-        "bsvertex[4][2]" : "bz",
-        "bsvertex[4][3]" : "bt",
-        "bsdir[3][0]" : "x_dir",
-        "bsdir[3][1]" : "y_dir",
-        "bsdir[3][2]" : "z_dir",
-        "swtrigger.trigid" : "trigid",
-        "ndaysk[3][0]" : "year",
-        "ndaysk[3][1]" : "month",
-        "ndaysk[3][2]" : "day"
-    })
-else:
+def generate_random_hits():
     import random
     import numpy as np
     import pandas as pd
@@ -214,6 +188,49 @@ else:
         "q" : qs
     }
     )
+
+    return df
+
+if len(sys.argv) > 1:
+    # Prep the file to plot events from
+    fname = sys.argv[1]
+    f = uproot.open(fname)
+    # Get tree name, check if it's WIT or SKROOT
+    # Comes as bytes-like, decode to string
+    tree = f.keys()[0].decode("utf-8")
+    # Has ; if more than one Tree (I think)
+    # Split at the ; and get the base text
+    tree = tree.split(";")[0]
+    # For some reason WIT has diffenent hit info names
+    if tree == "wit":
+        cols.extend(["cable","t","q"])
+    elif tree == "data":
+        cols.extend(["cables","T","Q"])
+
+    df = f[tree].pandas.df(cols, flatten=False)
+    df = df.rename(columns={
+        # "BONSAI.bx" : "x",
+        # "BONSAI.by" : "y",
+        # "BONSAI.bz" : "z",
+        # "BONSAI.btheta" : "theta",
+        # "BONSAI.bphi" : "phi",
+        "bsvertex[4][0]" : "bx",
+        "bsvertex[4][1]" : "by",
+        "bsvertex[4][2]" : "bz",
+        "bsvertex[4][3]" : "bt",
+        "bsdir[3][0]" : "x_dir",
+        "bsdir[3][1]" : "y_dir",
+        "bsdir[3][2]" : "z_dir",
+        "swtrigger.trigid" : "trigid",
+        "ndaysk[3][0]" : "year",
+        "ndaysk[3][1]" : "month",
+        "ndaysk[3][2]" : "day",
+        "cables" : "cable", # convert to WIT style for consistency
+        "T" : "t",
+        "Q" : "q"
+    })
+else:
+    df = generate_random_hits()
 
 # Create an object of the above class
 handler = WCEVDRequestHandler(df)
