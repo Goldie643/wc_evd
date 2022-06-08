@@ -229,6 +229,10 @@ if len(sys.argv) > 1:
         "T" : "t",
         "Q" : "q"
     })
+
+    # Check if the cables need to be converted from 32 to 16 bit... I think
+    if df.iloc[0]["cable"][0] > 11146:
+        df["cable"] = df["cable"].apply(lambda x: [y & 65535 for y in x])
 else:
     df = generate_random_hits()
 
