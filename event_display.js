@@ -305,7 +305,7 @@ const xyz_scene =  new THREE.Scene();
 const pmts = PlotPMTs( scene, pmt_info, event_data );
 const hit_pmts = pmts[0];
 const nohit_pmts = pmts[1];
-PlotVTX( scene, event_data )
+// PlotVTX( scene, event_data )
 PlotXYZ( xyz_scene )
 
 // Setup a default camera (other control types like Ortho are available).
@@ -329,8 +329,8 @@ const xyz_camera = new THREE.OrthographicCamera( -d*xyz_aspect, d*xyz_aspect, d,
 const controls = new OrbitControls( camera, renderer.domElement );
 // Separate control
 const xyz_controls = new OrbitControls( xyz_camera, renderer.domElement );
-xyz_controls.enableZoom = false
-xyz_controls.enablePan = false
+xyz_controls.enableZoom = false;
+xyz_controls.enablePan = false;
 
 camera.position.set( 0, 8000, 3000 );
 // camera.position.set( 0, 0, 30000 );
@@ -339,18 +339,21 @@ xyz_camera.position.set( 0, 80000, 30000 );
 // xyz_camera.position.set( 0, 0, 30000 );
 xyz_camera.lookAt( 0, 0, 0 );
 
+controls.autoRotate = true;
+xyz_controls.autoRotate = true;
+
 controls.saveState()
 xyz_controls.saveState()
 
 controls.update()
 
-const composer = new EffectComposer( renderer );
-const outlinePass = new OutlinePass(new THREE.Vector2(container.clientWidth,
-    container.clientHeight), scene, camera);
-composer.addPass( outlinePass );
-outlinePass.edgeStrength = 2;
+// const composer = new EffectComposer( renderer );
+// const outlinePass = new OutlinePass(new THREE.Vector2(container.clientWidth,
+//     container.clientHeight), scene, camera);
+// composer.addPass( outlinePass );
+// outlinePass.edgeStrength = 2;
 // outlinePass.edgeGlow = params.edgeGlow;
-outlinePass.visibleEdgeColor.set(0xffffff);
+// outlinePass.visibleEdgeColor.set(0xffffff);
 // outlinePass.hiddenEdgeColor.set(0xffffff);
 
 // renderer.render( scene, camera );
@@ -396,6 +399,8 @@ function changeView() {
     xyz_controls.reset()
     // If view is 3D, switch to 2D
     if ( view == "3D" ) {
+        controls.autoRotate = false;
+        xyz_controls.autoRotate = false;
         // Plot the 2D evd, put camera above it
         PlotPMTs2D( scene, pmt_info, event_data );
         camera.position.set( 0, 0, 100000 );
@@ -410,8 +415,10 @@ function changeView() {
         // Unbind roll, make lclick uses for pan. Can still roll with shift+click, disabling camera rotation doesn't fix for some reason
         controls.mouseButtons = {LEFT: rclk, MIDDLE: scrll, RIGHT: null};
     } else {
+        controls.autoRotate = true;
+        xyz_controls.autoRotate = true;
         PlotPMTs( scene, pmt_info, event_data );
-        PlotVTX( scene, event_data )
+        // PlotVTX( scene, event_data )
         PlotXYZ( xyz_scene )
         view = "3D";
         camera.position.set( 0, 8000, 3000 );
@@ -446,6 +453,10 @@ let raycaster = new THREE.Raycaster();
 let mouse = new THREE.Vector2()
 
 function onClick() {
+    // Stop the detector rotating
+    controls.autoRotate = false;
+    xyz_controls.autoRotate = false;
+
     mouse.x = (event.clientX / container.clientWidth) * 2 - 1;
     mouse.y = -(event.clientY / container.clientHeight) * 2 + 1;
   
