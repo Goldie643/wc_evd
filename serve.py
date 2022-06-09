@@ -253,7 +253,7 @@ my_server = socketserver.TCPServer(("", port), handler)
 print("Server started on port: " + str(port))
 print()
 print("If running REMOTELY...")
-print("In another window on your local machine, type:") 
+print("In another terminal on your local machine, type:") 
 print("ssh -L 8000:%s:%i %s@%s" % (hname,port,uname,hname))
 print("If 8000 doesn't work, try 8001.")
 print("Then open your browser and navigate to \"localhost:8000\" "
