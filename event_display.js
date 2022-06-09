@@ -148,7 +148,8 @@ function PlotPMTs2D( scene, pmt_info, event ) {
     const bot_pmts = pmt_info.filter(pmt => pmt.z < -SKHH+1);
     const wall_pmts = pmt_info.filter(pmt => pmt.z > -SKHH+1 && pmt.z < SKHH-1);
 
-    function AddPMTsToScene( pmt_sub_info, offset=0, wall=false ){
+    function AddPMTsToScene( pmt_sub_info, offset=0, region=""){
+        const caps_rot = - Math.PI/2;
         for (let pmt of pmt_sub_info) {
             let mat = nohit_mat;
             let name = "";
@@ -164,7 +165,7 @@ function PlotPMTs2D( scene, pmt_info, event ) {
             };
             const mesh = new THREE.Mesh( pmt_geom, mat );
             mesh.name = name;
-            if (wall){
+            if ( region == "wall" ){
                 // let theta = Math.atan( pmt.y/pmt.x );
                 // Avoid tan cause of near-infinites.
                 let theta = Math.acos( pmt.x / SKR );
@@ -177,15 +178,27 @@ function PlotPMTs2D( scene, pmt_info, event ) {
                 mesh.position.set( theta*SKR, pmt.z, 0 );
             }
             else{
-                mesh.position.set( pmt.x, pmt.y + offset, 0 );
+                let scale = 0;
+                if ( region == "top" ){ scale = -1 }
+                else if ( region == "bottom" ){ scale = 1 }
+                let pmt_vec = new THREE.Vector3( pmt.x, pmt.y, 0 )
+                pmt_vec.applyAxisAngle( new THREE.Vector3( 0, 0, 1 ), caps_rot )
+                pmt_vec.setY( scale*pmt_vec.y + offset )
+                mesh.position.copy( pmt_vec )
+
+                // let x = pmt.x;
+                // let y = pmt.y;
+                // x = x*Math.cos(caps_rot) - y*Math.sin(caps_rot);
+                // y = x*Math.sin(caps_rot) + y*Math.cos(caps_rot);
+                // mesh.position.set( x, y + offset, 0 );
             }
             scene.add( mesh );
         }
     }
 
-    AddPMTsToScene( top_pmts, 2*SKHH );
-    AddPMTsToScene( bot_pmts, -2*SKHH );
-    AddPMTsToScene( wall_pmts, 0, true );
+    AddPMTsToScene( top_pmts, 2*SKHH, "top" );
+    AddPMTsToScene( bot_pmts, -2*SKHH, "bottom" );
+    AddPMTsToScene( wall_pmts, 0, "wall" );
 
     return
 
