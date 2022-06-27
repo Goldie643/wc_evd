@@ -12,6 +12,13 @@ const MAX_R = Math.sqrt((2*1690)*(2*1690) + (2*1810)*(2*180))
 
 const event_data = await fetch("event.json").then(response => response.json());
 
+const id_pmts = pmt_info.filter(pmt => pmt.cable <= 11146)
+const od_pmts = pmt_info.filter(pmt => pmt.cable > 11146)
+
+const top_pmts = id_pmts.filter(pmt => pmt.z > SKHH-1);
+const bot_pmts = id_pmts.filter(pmt => pmt.z < -SKHH+1);
+const wall_pmts = id_pmts.filter(pmt => pmt.z > -SKHH+1 && pmt.z < SKHH-1);
+
 // Redefine z to be upwards as in SK's convention
 THREE.Object3D.DefaultUp = new THREE.Vector3(0, 0, 1);
 
@@ -98,7 +105,7 @@ function PlotPMTs( scene, pmt_info, event ) {
     const nohit_mat = new THREE.MeshBasicMaterial( {color: 0x808080,
         transparent: true, opacity: 0.1} );
     const nohit_pmts = [];
-    for (let pmt of pmt_info) {
+    for (let pmt of id_pmts) {
         let mat = nohit_mat;
         if (event.cable.includes( pmt.cable )) {
             // Don't plot hit PMTs
@@ -145,10 +152,6 @@ function PlotPMTs2D( scene, pmt_info, event ) {
     const nohit_mat = new THREE.MeshBasicMaterial( {color: 0x808080,
         transparent: true, opacity: 0.1} );
     const hit_mat = new THREE.MeshBasicMaterial( {color: 0xFFFF00} );
-
-    const top_pmts = pmt_info.filter(pmt => pmt.z > SKHH-1);
-    const bot_pmts = pmt_info.filter(pmt => pmt.z < -SKHH+1);
-    const wall_pmts = pmt_info.filter(pmt => pmt.z > -SKHH+1 && pmt.z < SKHH-1);
 
     function AddPMTsToScene( pmt_sub_info, offset=0, region=""){
         const caps_rot = - Math.PI/2;
