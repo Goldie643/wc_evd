@@ -12,16 +12,16 @@ const MAX_R = Math.sqrt((2*1690)*(2*1690) + (2*1810)*(2*180))
 
 const event_data = await fetch("event.json").then(response => response.json());
 
-const id_pmts = pmt_info.filter(pmt => pmt.cable <= 11146)
-const od_pmts = pmt_info.filter(pmt => pmt.cable > 11146)
+const pmt_info_id = pmt_info.filter(pmt => pmt.cable <= 11146)
+const pmt_info_od = pmt_info.filter(pmt => pmt.cable > 11146)
 
-const top_pmts = id_pmts.filter(pmt => pmt.z > SKHH-1);
-const bot_pmts = id_pmts.filter(pmt => pmt.z < -SKHH+1);
-const wall_pmts = id_pmts.filter(pmt => pmt.z > -SKHH+1 && pmt.z < SKHH-1);
+const top_pmts = pmt_info_id.filter(pmt => pmt.z > SKHH-1);
+const bot_pmts = pmt_info_id.filter(pmt => pmt.z < -SKHH+1);
+const wall_pmts = pmt_info_id.filter(pmt => pmt.z > -SKHH+1 && pmt.z < SKHH-1);
 
-const top_pmts_od = od_pmts.filter(pmt => pmt.z > SKHH-1);
-const bot_pmts_od = od_pmts.filter(pmt => pmt.z < -SKHH+1);
-const wall_pmts_od = od_pmts.filter(pmt => pmt.z > -SKHH+1 && pmt.z < SKHH-1);
+const top_pmts_od = pmt_info_od.filter(pmt => pmt.z > SKHH-1);
+const bot_pmts_od = pmt_info_od.filter(pmt => pmt.z < -SKHH+1);
+const wall_pmts_od = pmt_info_od.filter(pmt => pmt.z > -SKHH+1 && pmt.z < SKHH-1);
 
 // Redefine z to be upwards as in SK's convention
 THREE.Object3D.DefaultUp = new THREE.Vector3(0, 0, 1);
@@ -109,7 +109,7 @@ function PlotPMTs( scene, pmt_info, event ) {
     const nohit_mat = new THREE.MeshBasicMaterial( {color: 0x808080,
         transparent: true, opacity: 0.1} );
     const nohit_pmts = [];
-    for (let pmt of id_pmts) {
+    for (let pmt of pmt_info) {
         let mat = nohit_mat;
         if (event.cable.includes( pmt.cable )) {
             // Don't plot hit PMTs
@@ -147,6 +147,8 @@ function PlotPMTs( scene, pmt_info, event ) {
 
         // Find index in pmt_info for cable
         const cable_i = pmt_info.findIndex((x) => x.cable == cable);
+        // Hit isn't defined in this PMT info
+        if ( cable_i < 0 ) { continue }
         let pmt = pmt_info[cable_i];
         let hit_mat = new THREE.MeshBasicMaterial( 
             {color: PickColour(t_scaled)} );
@@ -163,6 +165,7 @@ function PlotPMTs( scene, pmt_info, event ) {
 
 
 function PlotPMTs2D( scene, event ) {
+    console.log(event);
     const nhit = event.t.length;
     const clamp_frac = 0.1;
     const clamp_n_half = Math.round(clamp_frac*nhit/2);
@@ -329,6 +332,7 @@ function PlotVTX( scene, vtx ) {
 
 // Setup container to render into
 const container = document.getElementById( "evd_renderer" )
+const od_container = document.getElementById( "od_renderer" )
 const xyz_container = document.getElementById( "xyz_renderer" )
 // document.body.appendChild( container );
 
@@ -337,12 +341,17 @@ const renderer = new THREE.WebGLRenderer( {alpha: true, antialias: true} );
 renderer.setSize( container.clientWidth, container.clientHeight );
 container.appendChild( renderer.domElement );
 
+const od_renderer = new THREE.WebGLRenderer( {alpha: true, antialias: true} );
+od_renderer.setSize( od_container.clientWidth, od_container.clientHeight );
+od_container.appendChild( od_renderer.domElement );
+
 const xyz_renderer = new THREE.WebGLRenderer( {alpha: true, antialias: true} );
 xyz_renderer.setSize( xyz_container.clientWidth, xyz_container.clientHeight );
 xyz_container.appendChild( xyz_renderer.domElement );
 
 // Setup a scene
 const scene = new THREE.Scene();
+const od_scene = new THREE.Scene();
 const xyz_scene =  new THREE.Scene();
 
 // Add all the meshes to the scene
@@ -350,7 +359,8 @@ const xyz_scene =  new THREE.Scene();
 // PlotHits( scene, hits );
 
 // PlotPMTs2D( scene, pmt_info, event );
-const pmts = PlotPMTs( scene, pmt_info, event_data );
+const pmts = PlotPMTs( scene, pmt_info_id, event_data );
+const od_pmts = PlotPMTs( od_scene, pmt_info_od, event_data );
 const hit_pmts = pmts[0];
 const nohit_pmts = pmts[1];
 // PlotVTX( scene, event_data )
@@ -358,42 +368,46 @@ PlotXYZ( xyz_scene )
 
 // Setup a default camera (other control types like Ortho are available).
 const d = 500;
-const aspect = window.innerWidth / window.innerHeight;
+// const aspect = window.innerWidth / window.innerHeight;
+const aspect = container.clientWidth / container.clientHeight;
 const camera = new THREE.PerspectiveCamera( 10, aspect, 1, 10000000 );
-// const camera = new THREE.OrthographicCamera( -d*aspect, d*aspect, d,
-//     -d, 1, 100000 );
-// const camera = new THREE.OrthographicCamera( -window.innerWidth, window.innerWidth, window.innerHeight,
-//     -window.innerHeight, 1, 100000 );
-camera.zoom = 0.2
+camera.zoom = 0.2;
 camera.updateProjectionMatrix();
-// const xyz_aspect = xyz_container.width / xyz_container.height
+
+const od_aspect = od_container.clientWidth / od_container.clientHeight;
+const od_camera = new THREE.PerspectiveCamera( 10, od_aspect, 1, 10000000 );
+od_camera.zoom = 0.1;
+od_camera.updateProjectionMatrix();
+
 const xyz_aspect = 1;
-// const xyz_camera = new THREE.OrthographicCamera( - window.innerWidth /
-//     window.innerHeight, 1, 100000 );
 const xyz_camera = new THREE.OrthographicCamera( -d*xyz_aspect, d*xyz_aspect, d,
     -d, 1, 100000 );
 
 // Control camera with orbit controls
 const controls = new OrbitControls( camera, renderer.domElement );
+const od_controls = new OrbitControls( od_camera, renderer.domElement );
 // Separate control
 const xyz_controls = new OrbitControls( xyz_camera, renderer.domElement );
 xyz_controls.enableZoom = false;
 xyz_controls.enablePan = false;
 
 camera.position.set( 0, 8000, 3000 );
-// camera.position.set( 0, 0, 30000 );
 camera.lookAt( 0, 0, 0 );
+od_camera.position.set( 0, 8000, 3000 );
+od_camera.lookAt( 0, 0, 0 );
 xyz_camera.position.set( 0, 80000, 30000 );
-// xyz_camera.position.set( 0, 0, 30000 );
 xyz_camera.lookAt( 0, 0, 0 );
 
 controls.autoRotate = true;
+od_controls.autoRotate = true;
 xyz_controls.autoRotate = true;
 
 controls.saveState()
+od_controls.saveState()
 xyz_controls.saveState()
 
 controls.update()
+od_controls.update()
 
 // const composer = new EffectComposer( renderer );
 // const outlinePass = new OutlinePass(new THREE.Vector2(container.clientWidth,
@@ -407,8 +421,10 @@ controls.update()
 // renderer.render( scene, camera );
 function animate() {
     controls.update()
+    od_controls.update()
     xyz_controls.update()
 	renderer.render( scene, camera );
+    od_renderer.render( od_scene, od_camera );
 	xyz_renderer.render( xyz_scene, xyz_camera );
 	requestAnimationFrame( animate );
 };
@@ -419,6 +435,7 @@ reset_btn.addEventListener("click", resetView)
 
 function resetView() { 
     controls.reset()
+    od_controls.reset()
     xyz_controls.reset()
     return
 }
@@ -442,15 +459,18 @@ const scrll = THREE.MOUSE.MIDDLE;
 // Switch between 3D and 2D 
 function changeView() {
     clearScene( scene );
+    clearScene( od_scene );
     clearScene( xyz_scene )
     controls.reset()
+    od_controls.reset()
     xyz_controls.reset()
     // If view is 3D, switch to 2D
     if ( view == "3D" ) {
         controls.autoRotate = false;
+        od_controls.autoRotate = false;
         xyz_controls.autoRotate = false;
         // Plot the 2D evd, put camera above it
-        PlotPMTs2D( scene, pmt_info, event_data );
+        PlotPMTs2D( scene, event_data );
         camera.position.set( 0, 0, 100000 );
         camera.lookAt( 0, 0, 0 );
         // Put far away to simulate ortho camera
@@ -464,8 +484,10 @@ function changeView() {
         controls.mouseButtons = {LEFT: rclk, MIDDLE: scrll, RIGHT: null};
     } else {
         controls.autoRotate = true;
+        od_controls.autoRotate = true;
         xyz_controls.autoRotate = true;
-        PlotPMTs( scene, pmt_info, event_data );
+        PlotPMTs( scene, pmt_info_id, event_data );
+        PlotPMTs( od_scene, pmt_info_od, event_data );
         // PlotVTX( scene, event_data )
         PlotXYZ( xyz_scene )
         view = "3D";
@@ -473,9 +495,14 @@ function changeView() {
         camera.lookAt( 0, 0, 0 );
         camera.fov = 10;
         camera.updateProjectionMatrix();
+        od_camera.position.set( 0, 8000, 3000 );
+        od_camera.lookAt( 0, 0, 0 );
+        od_camera.fov = 10;
+        od_camera.updateProjectionMatrix();
         xyz_camera.position.set( 0, 80000, 30000 );
         xyz_camera.lookAt( 0, 0, 0 );
         controls.saveState()
+        od_controls.saveState()
         xyz_controls.saveState()
         // Standard orbit controls
         controls.mouseButtons = {LEFT: lclk, MIDDLE: scrll, RIGHT: rclk};
@@ -488,6 +515,10 @@ function onWindowResize() {
     camera.aspect = container.clientWidth / container.clientHeight;
     camera.updateProjectionMatrix();
     renderer.setSize( container.clientWidth, container.clientHeight );
+
+    od_camera.aspect = od_container.clientWidth / od_container.clientHeight;
+    od_camera.updateProjectionMatrix();
+    od_renderer.setSize( od_container.clientWidth, od_container.clientHeight );
 
     xyz_camera.aspect = xyz_container.clientWidth / xyz_container.clientHeight;
     xyz_camera.updateProjectionMatrix();
@@ -503,6 +534,7 @@ let mouse = new THREE.Vector2()
 function onClick() {
     // Stop the detector rotating
     controls.autoRotate = false;
+    od_controls.autoRotate = false;
     xyz_controls.autoRotate = false;
 
     mouse.x = (event.clientX / container.clientWidth) * 2 - 1;

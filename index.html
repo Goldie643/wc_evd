@@ -66,17 +66,25 @@
         height: 100%;
         z-index: -1;
       }
+      #od_renderer {
+        position: absolute; 
+        top: 0%;
+        left: 0%;
+        width: 40%; 
+        height: 100%; 
+        z-index: -2;
+      }
       #xyz_renderer {
         position: absolute; 
         bottom: 10%;
         left: 15%;
         width: 200px;
         height: 200px;
-        z-index: -2;
+        z-index: -3;
       }
       #run_info {
         position: absolute;
-        top: 40%;
+        top: 10%;
         left: 15%;
         white-space: pre-line;
         width: flex;
@@ -162,6 +170,7 @@
     </div>
 
     <div id="evd_renderer"></div>
+    <div id="od_renderer"></div>
     <div id="xyz_renderer"></div>
     <!-- <p id="run_info">
     </p> -->
