@@ -3,7 +3,7 @@ import CSG from "./src/three-csg.js"
 import { OrbitControls } from "./src/OrbitControls.js"
 import { EffectComposer } from "./src/EffectComposer.js"
 import { OutlinePass } from "./src/OutlinePass.js"
-import { pmt_info } from "./pmt_prod_year.js"
+import { pmt_info } from "./connection.super.sk-4.js"
 
 const SKR = 1690; // Radius of SK
 const SKHH = 1810; // Half height of SK
@@ -119,8 +119,10 @@ function PlotPMTs( scene, pmt_info, event ) {
         let cable = event.cable[i];
         let t = event.t[i];
         let t_scaled = (t-t_min)/(t_max-t_min)
-        // PMT cables are 1-indexed
-        let pmt = pmt_info[cable-1];
+
+        // Find index in pmt_info for cable
+        const cable_i = pmt_info.findIndex((x) => x.cable == cable);
+        let pmt = pmt_info[cable_i];
         let hit_mat = new THREE.MeshBasicMaterial( 
             {color: PickColour(t_scaled)} );
         let mat = hit_mat;
