@@ -19,6 +19,10 @@ const top_pmts = id_pmts.filter(pmt => pmt.z > SKHH-1);
 const bot_pmts = id_pmts.filter(pmt => pmt.z < -SKHH+1);
 const wall_pmts = id_pmts.filter(pmt => pmt.z > -SKHH+1 && pmt.z < SKHH-1);
 
+const top_pmts_od = od_pmts.filter(pmt => pmt.z > SKHH-1);
+const bot_pmts_od = od_pmts.filter(pmt => pmt.z < -SKHH+1);
+const wall_pmts_od = od_pmts.filter(pmt => pmt.z > -SKHH+1 && pmt.z < SKHH-1);
+
 // Redefine z to be upwards as in SK's convention
 THREE.Object3D.DefaultUp = new THREE.Vector3(0, 0, 1);
 
@@ -118,14 +122,28 @@ function PlotPMTs( scene, pmt_info, event ) {
     }
 
     // const hit_mat = new THREE.MeshBasicMaterial( {color: 0xFFFF00} );
-    const t_max = Math.max(...event.t);
-    const t_min = Math.min(...event.t);
+    const nhit = event.t.length;
+    // Fraction to remove from colour scale calc
+    const clamp_frac = 0.1;
+    const clamp_n_half = Math.round(clamp_frac*nhit/2);
+    const t_sort = event.t.sort(function(a, b){return a - b});
+    const t_max = t_sort[t_sort.length-clamp_n_half];
+    const t_min = t_sort[clamp_n_half];
+    // const t_max = Math.max(...event.t);
+    // const t_min = Math.min(...event.t);
     const hit_pmts = [];
     // Loop through all hits
     for (let i = 0; i < event.cable.length; i++) {
         let cable = event.cable[i];
         let t = event.t[i];
+
+        // Scale for colour scale calculations
         let t_scaled = (t-t_min)/(t_max-t_min)
+        if ( t > t_max ) {
+            t_scaled = 1;
+        } else if ( t < t_min ) {
+            t_scaled = 0;
+        } 
 
         // Find index in pmt_info for cable
         const cable_i = pmt_info.findIndex((x) => x.cable == cable);
@@ -144,9 +162,15 @@ function PlotPMTs( scene, pmt_info, event ) {
 }
 
 
-function PlotPMTs2D( scene, pmt_info, event ) {
-    const t_max = Math.max(...event.t);
-    const t_min = Math.min(...event.t);
+function PlotPMTs2D( scene, event ) {
+    const nhit = event.t.length;
+    const clamp_frac = 0.1;
+    const clamp_n_half = Math.round(clamp_frac*nhit/2);
+    const t_sort = event.t.sort(function(a, b){return a - b});
+    const t_max = t_sort[t_sort.length-clamp_n_half];
+    const t_min = t_sort[clamp_n_half];
+    // const t_max = Math.max(...event.t);
+    // const t_min = Math.min(...event.t);
 
     const pmt_geom = new THREE.SphereGeometry( 25, 32, 16 );
     const nohit_mat = new THREE.MeshBasicMaterial( {color: 0x808080,
@@ -163,7 +187,13 @@ function PlotPMTs2D( scene, pmt_info, event ) {
                 const cable_i = event.cable.findIndex((x) => x == pmt.cable);
                 let t = event.t[cable_i];
                 // Scale to a fraction of max and min
+                // Scale for colour scale calculations
                 let t_scaled = (t-t_min)/(t_max-t_min)
+                if ( t > t_max ) {
+                    t_scaled = 1;
+                } else if ( t < t_min ) {
+                    t_scaled = 0;
+                } 
                 mat = new THREE.MeshBasicMaterial( 
                     {color: PickColour(t_scaled)} );
                 name = "HIT";
