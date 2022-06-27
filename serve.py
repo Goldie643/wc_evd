@@ -4,6 +4,7 @@ import http.server
 import socket
 import socketserver
 import getpass
+import numpy as np
 from urllib import parse
 
 class WCEVDRequestHandler(http.server.SimpleHTTPRequestHandler):
