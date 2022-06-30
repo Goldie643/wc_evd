@@ -5,6 +5,7 @@ import socket
 import socketserver
 import getpass
 import numpy as np
+import pandas as pd
 from urllib import parse
 
 class WCEVDRequestHandler(http.server.SimpleHTTPRequestHandler):
@@ -202,11 +203,6 @@ if len(sys.argv) > 1:
     # Has ; if more than one Tree (I think)
     # Split at the ; and get the base text
     tree = tree.split(";")[0]
-    # For some reason WIT has diffenent hit info names
-    if tree == "wit":
-        cols.extend(["cable","t","q"])
-    elif tree == "data":
-        cols.extend(["cables","T","Q"])
 
     df = f[tree].pandas.df(cols, flatten=False)
     df = df.rename(columns={
@@ -226,10 +222,40 @@ if len(sys.argv) > 1:
         "ndaysk[3][0]" : "year",
         "ndaysk[3][1]" : "month",
         "ndaysk[3][2]" : "day",
-        "cables" : "cable", # convert to WIT style for consistency
-        "T" : "t",
-        "Q" : "q"
+        # "cables" : "cable", # convert to WIT style for consistency
+        # "T" : "t",
+        # "Q" : "q"
     })
+
+    # Individually import hit info because uproot gets confused with duplicate
+    # branch names
+    # For some reason WIT has different hit info names
+    if tree == "wit":
+        # WIT doesn't store OD hit info
+        cols.extend(["cable","t","q"])
+    elif tree == "data":
+        df_id = f[tree].pandas.df(["TQREAL/T","TQREAL/Q","TQREAL/cables"], 
+            flatten=False)
+        df_od = f[tree].pandas.df(["TQAREAL/T","TQAREAL/Q","TQAREAL/cables"], 
+            flatten=False)
+        
+        # df_id.columns = ["t_id", "q_id", "cable_id"]
+        # df_od.columns = ["t_od", "q_od", "cable_od"]
+
+        # Take two series numpy arrays, change them to lists and concat them
+        def concat_list_col(s1, s2, k1, k2=""):
+            # Keys
+            if k2 == "":
+                k2 = k1
+            s1_lst = s1[k1].apply(lambda x: x.tolist())
+            s2_lst = s2[k2].apply(lambda x: x.tolist())
+            
+            return s1_lst + s2_lst
+
+        # Use WIT naming convention
+        df["t"] = concat_list_col(df_id, df_od, "T")
+        df["q"] = concat_list_col(df_id, df_od, "Q")
+        df["cable"] = concat_list_col(df_id, df_od, "cables")
 
     # Check if the cables need to be converted from 32 to 16 bit... I think
     if df.iloc[0]["cable"][0] > 11146:
