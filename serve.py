@@ -5,7 +5,6 @@ import socket
 import socketserver
 import getpass
 import numpy as np
-import pandas as pd
 from urllib import parse
 
 class WCEVDRequestHandler(http.server.SimpleHTTPRequestHandler):
@@ -266,15 +265,28 @@ else:
 # Create an object of the above class
 handler = WCEVDRequestHandler(df)
 
-sock = socket.socket()
-sock.bind(("",0))
-port = sock.getsockname()[1]
-sock.close()
-
 hname = socket.gethostname()
 uname = getpass.getuser()
 
-my_server = socketserver.TCPServer(("", port), handler)
+port = 1987
+limit = port+10
+connected = False
+while not connected and port <= limit:
+    try:
+        my_server = socketserver.TCPServer(("", port), handler)
+        connected = True
+    except OSError as err:
+        if err.errno == 10048:
+            port += 1
+            continue
+        else:
+            print(err)
+
+if not connected:
+    print("Cannot find free port from ports %i to %i.")
+    print("Check what is using the ports, or manually change the port in serve.py.")
+    print("Exiting...")
+    exit()
 
 # Start the server
 print("Server started on port: " + str(port))
