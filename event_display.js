@@ -10,7 +10,9 @@ const SKHH = 1810; // Half height of SK
 // Longest distance in tank
 const MAX_R = Math.sqrt((2*1690)*(2*1690) + (2*1810)*(2*180)) 
 
-const event_data = await fetch("event.json").then(response => response.json());
+const event_data = await fetch("./event.json").then(response => response.json());
+
+console.log(event_data)
 
 const pmt_info_id = pmt_info.filter(pmt => pmt.cable <= 11146)
 const pmt_info_od = pmt_info.filter(pmt => pmt.cable > 11146)
