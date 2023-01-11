@@ -160,5 +160,5 @@ else:
 event_dir = "./event_data/"
 if not os.path.exists(event_dir):
     os.makedirs(event_dir)
-for i in range(len(df)):
+for i in range(min(len(df),10)):
     df.iloc[i].to_json("%sevent_%i.json" % (event_dir, i))
