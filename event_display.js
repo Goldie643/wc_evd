@@ -1,4 +1,4 @@
-import * as THREE from "three"
+import * as THREE from "./src/three.module"
 import CSG from "./src/three-csg.js"
 import { OrbitControls } from "./src/OrbitControls.js"
 import { EffectComposer } from "./src/EffectComposer.js"
