@@ -1,3 +1,4 @@
+import os
 import sys
 import uproot
 
@@ -156,4 +157,8 @@ if len(sys.argv) > 1:
 else:
     df = generate_random_hits()
 
-df.to_json("./event.json")
+event_dir = "./event_data/"
+if not os.path.exists(event_dir):
+    os.makedirs(event_dir)
+for i in range(len(df)):
+    df.iloc[i].to_json("%sevent_%i.json" % (event_dir, i))
