@@ -445,9 +445,11 @@ const next_btn = document.getElementById("next_button")
 next_btn.addEventListener("click", nextEvent)
 
 function nextEvent() {
-    // Iterate event ID up
-    // TODO: check for end of events, loop back round
+    // Iterate event ID up, checking if it's out of array range 
     event_id++
+    if(event_id == event_datas.length){
+        event_id = 0
+    }
     event_data = event_datas[event_id]
 
     clearScene( scene );
@@ -464,9 +466,11 @@ const prev_btn = document.getElementById("prev_button")
 prev_btn.addEventListener("click", prevEvent)
 
 function prevEvent() {
-    // Iterate event ID up
-    // TODO: check for end of events, loop back round
+    // Iterate event ID down, loop back to end of array if at start
     event_id--
+    if(event_id < 0){
+        event_id = event_datas.length - 1
+    }
     event_data = event_datas[event_id]
 
     clearScene( scene );
@@ -480,6 +484,7 @@ function prevEvent() {
 }
 
 function hardResetView() {
+    console.log(event_id)
     // Retain view between events
     if ( view == "2D" ) {
         controls.autoRotate = false;
