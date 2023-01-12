@@ -459,7 +459,7 @@ function nextEvent() {
     od_controls.reset()
     xyz_controls.reset()
 
-    hardResetView()
+    resetAll()
 }
 
 const prev_btn = document.getElementById("prev_button")
@@ -480,10 +480,13 @@ function prevEvent() {
     od_controls.reset()
     xyz_controls.reset()
 
-    hardResetView()
+    resetAll()
 }
 
-function hardResetView() {
+function resetAll() {
+    Plotly.purge("thist_div")
+    Plotly.purge("qhist_div")
+    plotHists()
     console.log(event_id)
     // Retain view between events
     if ( view == "2D" ) {
@@ -697,11 +700,24 @@ event_no.addEventListener("keyup", function (e) {
     }
 });
 
-// Plot Q and T histograms
-const thist = {
-    x: event_data.t,
-    type: "histogram",
-};
+function plotHists() {
+    // Plot Q and T histograms
+    const thist = {
+        x: event_data.t,
+        type: "histogram",
+    };
+    const tdata = [thist];
+    Plotly.newPlot("thist_div", tdata, thist_layout);
+
+    const qhist = {
+        x: event_data.q,
+        type: "histogram",
+    };
+    const qdata = [qhist];
+    Plotly.newPlot("qhist_div", qdata, qhist_layout);
+
+}
+
 const thist_layout = {
     width: "500",
     height: "400",
@@ -715,13 +731,6 @@ const thist_layout = {
         title: "t [ns]"
     }
 }
-const tdata = [thist];
-Plotly.newPlot("thist_div", tdata, thist_layout);
-
-const qhist = {
-    x: event_data.q,
-    type: "histogram",
-};
 const qhist_layout = {
     width: "500",
     height: "400",
@@ -735,8 +744,8 @@ const qhist_layout = {
         title: "q [pe]"
     }
 }
-const qdata = [qhist];
-Plotly.newPlot("qhist_div", qdata, qhist_layout);
+
+plotHists()
 
 // scene.matrixAutoUpdate = false;
 // scene.autoUpdate = false;
