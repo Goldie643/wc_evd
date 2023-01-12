@@ -10,8 +10,18 @@ const SKHH = 1810; // Half height of SK
 // Longest distance in tank
 const MAX_R = Math.sqrt((2*1690)*(2*1690) + (2*1810)*(2*180)) 
 
-const event_data = await fetch("./event_data/event_0.json").then(
-    response => response.json());
+var event_id = 0
+// TODO: Make this add all files in the folder
+const n_files = 10
+const event_datas = []
+var event_data = null
+for(let i=0; i<n_files; i++){
+    let event_fname = `./event_data/event_${i}.json`
+    event_data = await fetch(event_fname).then(response => response.json());
+    event_datas.push(event_data)
+}
+event_data = event_datas[event_id]
+console.log(event_data)
 
 const pmt_info_id = pmt_info.filter(pmt => pmt.cable <= 11146)
 const pmt_info_od = pmt_info.filter(pmt => pmt.cable > 11146)
@@ -431,6 +441,90 @@ function animate() {
 };
 animate();
 
+const next_btn = document.getElementById("next_button")
+next_btn.addEventListener("click", nextEvent)
+
+function nextEvent() {
+    // Iterate event ID up
+    // TODO: check for end of events, loop back round
+    event_id++
+    event_data = event_datas[event_id]
+
+    clearScene( scene );
+    clearScene( od_scene );
+    clearScene( xyz_scene )
+    controls.reset()
+    od_controls.reset()
+    xyz_controls.reset()
+
+    hardResetView()
+}
+
+const prev_btn = document.getElementById("prev_button")
+prev_btn.addEventListener("click", prevEvent)
+
+function prevEvent() {
+    // Iterate event ID up
+    // TODO: check for end of events, loop back round
+    event_id--
+    event_data = event_datas[event_id]
+
+    clearScene( scene );
+    clearScene( od_scene );
+    clearScene( xyz_scene )
+    controls.reset()
+    od_controls.reset()
+    xyz_controls.reset()
+
+    hardResetView()
+}
+
+function hardResetView() {
+    // Retain view between events
+    if ( view == "2D" ) {
+        controls.autoRotate = false;
+        od_controls.autoRotate = false;
+        xyz_controls.autoRotate = false;
+        // Plot the 2D evd, put camera above it
+        PlotPMTs2D( scene, event_data );
+        camera.position.set( 0, 0, 100000 );
+        camera.lookAt( 0, 0, 0 );
+        // Put far away to simulate ortho camera
+        camera.fov = 1.5;
+        camera.updateProjectionMatrix();
+        // Easiest to just reset everything
+        controls.saveState()
+        xyz_controls.saveState()
+        // Unbind roll, make lclick uses for pan. Can still roll with shift+click, disabling camera rotation doesn't fix for some reason
+        controls.mouseButtons = {LEFT: rclk, MIDDLE: scrll, RIGHT: null};
+    } else {
+        controls.autoRotate = true;
+        od_controls.autoRotate = true;
+        xyz_controls.autoRotate = true;
+        PlotPMTs( scene, pmt_info_id, event_data );
+        PlotPMTs( od_scene, pmt_info_od, event_data );
+        // PlotVTX( scene, event_data )
+        PlotXYZ( xyz_scene )
+        camera.position.set( 0, 8000, 3000 );
+        camera.lookAt( 0, 0, 0 );
+        camera.fov = 10;
+        camera.updateProjectionMatrix();
+        od_camera.position.set( 0, 8000, 3000 );
+        od_camera.lookAt( 0, 0, 0 );
+        od_camera.fov = 10;
+        od_camera.updateProjectionMatrix();
+        xyz_camera.position.set( 0, 80000, 30000 );
+        xyz_camera.lookAt( 0, 0, 0 );
+        controls.saveState()
+        od_controls.saveState()
+        xyz_controls.saveState()
+        // Standard orbit controls
+        controls.mouseButtons = {LEFT: lclk, MIDDLE: scrll, RIGHT: rclk};
+    }
+    return
+}
+
+
 const reset_btn = document.getElementById("reset_button"); 
 reset_btn.addEventListener("click", resetView)
 
@@ -481,7 +575,8 @@ function changeView() {
         // Easiest to just reset everything
         controls.saveState()
         xyz_controls.saveState()
-        // Unbind roll, make lclick uses for pan. Can still roll with shift+click, disabling camera rotation doesn't fix for some reason
+        // Unbind roll, make lclick uses for pan. Can still roll with 
+        // shift+click, disabling camera rotation doesn't fix for some reason
         controls.mouseButtons = {LEFT: rclk, MIDDLE: scrll, RIGHT: null};
     } else {
         controls.autoRotate = true;
