@@ -11,16 +11,29 @@ const SKHH = 1810; // Half height of SK
 const MAX_R = Math.sqrt((2*1690)*(2*1690) + (2*1810)*(2*180)) 
 
 var event_id = 0
-// TODO: Make this add all files in the folder
-const n_files = 10
-const event_datas = []
-var event_data = null
-for(let i=0; i<n_files; i++){
-    let event_fname = `./event_data/event_${i}.json`
-    event_data = await fetch(event_fname).then(response => response.json());
-    event_datas.push(event_data)
+// Whether to load events from data like event_0.json, event_1.json etc
+// Or load from a single json file.
+const sep_files = false
+
+var event_datas = null
+if (sep_files) {
+    // TODO: Make this add all files in the folder
+    const n_files = 10
+    var event_data = null
+    event_datas = []
+    for(let i=0; i<n_files; i++){
+        let event_fname = `./event_data/event_${i}.json`
+        event_data = await fetch(event_fname).then(response => response.json());
+        event_datas.push(event_data)
+    }
+} else {
+    let event_fname = `./event_data/event_merged.json`
+    event_datas = await fetch(event_fname).then(
+        response => response.json());
 }
+
 event_data = event_datas[event_id]
+
 console.log(event_data)
 
 const pmt_info_id = pmt_info.filter(pmt => pmt.cable <= 11146)
