@@ -40,22 +40,45 @@ const n_datasets = 10
 const n_events = dataset.length
 const dataset_length = Math.ceil(n_events/n_datasets)
 const datasets = []
+const dataset_buttons = []
 for (let i=0; i<n_datasets; i++){
     // Slice up the original full dataset to n_datasets shorter ones
     datasets.push(dataset.slice(i*dataset_length,(i+1)*dataset_length))
     // Add a button for each
     let dataset_button = document.createElement("button")
+    // Set test to 1-indexed
     dataset_button.innerText = `${(i+1)}`
+    // And internal parameter to actual i
+    dataset_button.dataset_id = i
+    // Fire changeDataset when clicked
+    dataset_button.addEventListener("click", changeDataset)
+    // Add to div
     document.getElementById("datasets").appendChild(dataset_button)
+    dataset_buttons.push(dataset_button)
 }
 
+const selected_bg_color = "#29303A"
+// Set initial dataset as clicked
+dataset_buttons[dataset_id].style.backgroundColor = selected_bg_color
+
+// Get the dataset_i of the button clicked, set the dataset to that and reload
+function changeDataset(event) {
+    // First reset background colour of all buttons
+    for (let i=0; i<dataset_buttons.length; i++){
+        dataset_buttons[i].style.backgroundColor = "transparent"
+    }
+    event.currentTarget.style.backgroundColor = selected_bg_color 
+    // Update dataset id, load new dataset from array
+    dataset_id = event.currentTarget.dataset_id
+    dataset = datasets[dataset_id]
+    event_id = 0
+    event_data = dataset[event_id]
+    resetAll()
+}
 
 dataset = datasets[dataset_id]
-console.log(dataset)
 
 event_data = dataset[event_id]
-
-console.log(event_data)
 
 const pmt_info_id = pmt_info.filter(pmt => pmt.cable <= 11146)
 const pmt_info_od = pmt_info.filter(pmt => pmt.cable > 11146)
@@ -506,7 +529,10 @@ function prevEvent() {
         event_id = dataset.length - 1
     }
     event_data = dataset[event_id]
+    resetAll()
+}
 
+function resetAll() {
     clearScene( scene );
     clearScene( od_scene );
     clearScene( xyz_scene )
@@ -514,10 +540,6 @@ function prevEvent() {
     od_controls.reset()
     xyz_controls.reset()
 
-    resetAll()
-}
-
-function resetAll() {
     Plotly.purge("thist_div")
     Plotly.purge("qhist_div")
     plotHists()
