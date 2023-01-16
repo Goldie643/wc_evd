@@ -736,7 +736,9 @@ const event_no_err = document.getElementById("event_no_err")
 event_no.value = event_id;
 event_no.addEventListener("keyup", function (e) {
     if (e.key === "Enter") {
-        event_id = event_no.value
+        // Ensure event ID is within range of dataset
+        event_id = Math.min(event_no.value, (dataset.length-1))
+        event_id = Math.max(event_id, 0)
         resetAll()
     }
 });
