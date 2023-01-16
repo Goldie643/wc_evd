@@ -507,15 +507,6 @@ function nextEvent() {
     if(event_id == dataset.length){
         event_id = 0
     }
-    event_data = dataset[event_id]
-
-    clearScene( scene );
-    clearScene( od_scene );
-    clearScene( xyz_scene )
-    controls.reset()
-    od_controls.reset()
-    xyz_controls.reset()
-
     resetAll()
 }
 
@@ -528,11 +519,13 @@ function prevEvent() {
     if(event_id < 0){
         event_id = dataset.length - 1
     }
-    event_data = dataset[event_id]
     resetAll()
 }
 
 function resetAll() {
+    event_no.value = event_id;
+    dataset = datasets[dataset_id]
+    event_data = dataset[event_id]
     clearScene( scene );
     clearScene( od_scene );
     clearScene( xyz_scene )
@@ -739,20 +732,12 @@ run_info.appendChild(run_text);
 // Print event number into input field, get it to get a specific event
 const event_no = document.getElementById("event_no");
 const event_no_err = document.getElementById("event_no_err")
-event_no.value = event_data.nevsk;
+// event_no.value = event_data.nevsk;
+event_no.value = event_id;
 event_no.addEventListener("keyup", function (e) {
     if (e.key === "Enter") {
-        const event_query = `?event=${event_no.value}`
-        fetch(event_query).then(response => {
-            console.log(response)
-            if (response.ok) {
-                event_no_err.innerHTML = ""
-                window.location.replace('/')
-            }
-            else {
-                event_no_err.innerHTML = "Event not found!"
-            }
-        })
+        event_id = event_no.value
+        resetAll()
     }
 });
 
