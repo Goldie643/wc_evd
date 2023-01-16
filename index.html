@@ -5,7 +5,7 @@
     <link rel="icon"  type="image/x-icon" href="/favicon.png">
     <title>WCEVD</title>
     <style>
-      .button {
+      button {
         border-style: solid;
         background-color: transparent;
         color: rgb(56, 113, 192);
@@ -35,7 +35,7 @@
         bottom: 80px;
         text-align: center;
       }
-      .button:hover {
+      button:hover {
         background-color: rgb(41, 48, 58);
         cursor: pointer;
       }
@@ -45,6 +45,20 @@
         right: 16px;
         text-align: right;
         font-size: small;
+      }
+      #datasets {
+        margin: 0 auto;
+        position: absolute;
+        top: 8px;
+        text-align: center;
+        vertical-align: middle;
+      }
+      #datasets button{
+        width: 50px;
+        height: 50px;
+        font-size: x-large;
+        margin-left: 5px;
+        margin-righ: 5px;
       }
       #thist_div{
         position: absolute;
@@ -153,6 +167,8 @@
   </head>
   <!-- <body class="darktheme" style="overflow:hidden"> -->
   <body class="darktheme" style="background-color: rgb(31, 34, 36);">
+
+    <div id="datasets">Dataset: </div>
 
     <button class="button prev" id="prev_button"><</button>
     <button class="button next" id="next_button">></button>

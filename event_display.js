@@ -15,24 +15,45 @@ var event_id = 0
 // Or load from a single json file.
 const sep_files = false
 
-var event_datas = null
+var dataset = null
 if (sep_files) {
     // TODO: Make this add all files in the folder
     const n_files = 10
     var event_data = null
-    event_datas = []
+    dataset = []
     for(let i=0; i<n_files; i++){
         let event_fname = `./event_data/event_${i}.json`
         event_data = await fetch(event_fname).then(response => response.json());
-        event_datas.push(event_data)
+        dataset.push(event_data)
     }
 } else {
     let event_fname = `./event_data/event_merged.json`
-    event_datas = await fetch(event_fname).then(
+    dataset = await fetch(event_fname).then(
         response => response.json());
 }
 
-event_data = event_datas[event_id]
+// Split up the data into datasets
+var dataset_id = 0
+// TODO: Make this dynamic (including dynamically generating buttons)
+// IMPORTANT currently requires the same number of buttons in index.html
+const n_datasets = 10
+const n_events = dataset.length
+const dataset_length = Math.ceil(n_events/n_datasets)
+const datasets = []
+for (let i=0; i<n_datasets; i++){
+    // Slice up the original full dataset to n_datasets shorter ones
+    datasets.push(dataset.slice(i*dataset_length,(i+1)*dataset_length))
+    // Add a button for each
+    let dataset_button = document.createElement("button")
+    dataset_button.innerText = `${(i+1)}`
+    document.getElementById("datasets").appendChild(dataset_button)
+}
+
+
+dataset = datasets[dataset_id]
+console.log(dataset)
+
+event_data = dataset[event_id]
 
 console.log(event_data)
 
@@ -460,10 +481,10 @@ next_btn.addEventListener("click", nextEvent)
 function nextEvent() {
     // Iterate event ID up, checking if it's out of array range 
     event_id++
-    if(event_id == event_datas.length){
+    if(event_id == dataset.length){
         event_id = 0
     }
-    event_data = event_datas[event_id]
+    event_data = dataset[event_id]
 
     clearScene( scene );
     clearScene( od_scene );
@@ -482,9 +503,9 @@ function prevEvent() {
     // Iterate event ID down, loop back to end of array if at start
     event_id--
     if(event_id < 0){
-        event_id = event_datas.length - 1
+        event_id = dataset.length - 1
     }
-    event_data = event_datas[event_id]
+    event_data = dataset[event_id]
 
     clearScene( scene );
     clearScene( od_scene );
