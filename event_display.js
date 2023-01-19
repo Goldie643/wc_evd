@@ -693,22 +693,22 @@ function onClick() {
     mouse.x = (event.clientX / container.clientWidth) * 2 - 1;
     mouse.y = -(event.clientY / container.clientHeight) * 2 + 1;
   
-    raycaster.setFromCamera(mouse, camera);
+    // raycaster.setFromCamera(mouse, camera);
   
-    var intersects = raycaster.intersectObjects(scene.children, false);
+    // var intersects = raycaster.intersectObjects(scene.children, false);
   
-    if (intersects.length > 0) {
-        for ( let i = 0; i < intersects.length; i++) {
-            const object = intersects[i].object;
-            if ( object.name == "HIT" ){
-                console.log(mouse)
-                outlinePass.selectedObjects = [object];
-                // object.material.color.set( "rgb(255,0,0)" );
-                // Don't want to set everything behind it too
-                break;
-            }
-        }
-    }
+    // if (intersects.length > 0) {
+    //     for ( let i = 0; i < intersects.length; i++) {
+    //         const object = intersects[i].object;
+    //         if ( object.name == "HIT" ){
+    //             console.log(mouse)
+    //             outlinePass.selectedObjects = [object];
+    //             // object.material.color.set( "rgb(255,0,0)" );
+    //             // Don't want to set everything behind it too
+    //             break;
+    //         }
+    //     }
+    // }
       
     renderer.render( scene, camera );
     // composer.render( scene, camera );
