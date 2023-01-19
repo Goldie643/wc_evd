@@ -589,6 +589,9 @@ function resetView() {
     controls.reset()
     od_controls.reset()
     xyz_controls.reset()
+    controls.autoRotate = true;
+    od_controls.autoRotate = true;
+    xyz_controls.autoRotate = true;
     return
 }
 
