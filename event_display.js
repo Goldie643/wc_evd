@@ -720,17 +720,17 @@ function onClick() {
 renderer.domElement.addEventListener('click', onClick, true);
 
 // Now print out event information
-const run_info_str = `Run: ${event_data.nrunsk} 
-    Subrun: ${event_data.nsubsk} 
-    Date: ${event_data.year}-${event_data.month}-${event_data.day}
+// const run_info_str = `Run: ${event_data.nrunsk} 
+//     Subrun: ${event_data.nsubsk} 
+//     Date: ${event_data.year}-${event_data.month}-${event_data.day}
 
-    Trigid: ${event_data.trigid}
-    BONSAI Energy: ${event_data.bsenergy.toFixed(3)} MeV
-    `;
-const run_info = document.getElementById("run_info_text");
-const run_text = document.createTextNode(run_info_str);
+//     Trigid: ${event_data.trigid}
+//     BONSAI Energy: ${event_data.bsenergy.toFixed(3)} MeV
+//     `;
+// const run_info = document.getElementById("run_info_text");
+// const run_text = document.createTextNode(run_info_str);
 
-run_info.appendChild(run_text);
+// run_info.appendChild(run_text);
 
 // Print event number into input field, get it to get a specific event
 const event_no = document.getElementById("event_no");
